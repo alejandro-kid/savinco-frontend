@@ -1,9 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
+import { type TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
+import { financialDataReducer } from '../../modules/financial-data/infrastructure/redux/financial-data.slice';
 
-// TODO: importar reducers de módulos cuando existan
 export const store = configureStore({
-  reducer: {},
+  reducer: {
+    financialData: financialDataReducer,
+  },
 });
 
 export type RootState = ReturnType<typeof store.getState>;
@@ -11,5 +13,3 @@ export type AppDispatch = typeof store.dispatch;
 
 export const useAppDispatch: () => AppDispatch = useDispatch;
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
-
-

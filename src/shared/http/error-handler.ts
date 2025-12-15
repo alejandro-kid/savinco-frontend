@@ -18,5 +18,3 @@ export const parseApiError = (error: unknown): ApiErrorResponse | null => {
 
   return null;
 };
-
-
