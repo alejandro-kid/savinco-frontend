@@ -1,11 +1,11 @@
 import axios from 'axios';
+import { API_CONFIG } from '../config/env';
 import type { ApiClientConfig } from './types';
-
-const DEFAULT_BASE_URL = 'http://localhost:8080/api/v1';
 
 export const createApiClient = (config?: ApiClientConfig) => {
   return axios.create({
-    baseURL: config?.baseURL ?? DEFAULT_BASE_URL,
+    baseURL: config?.baseURL ?? API_CONFIG.BASE_URL,
+    timeout: config?.timeout ?? API_CONFIG.TIMEOUT,
     headers: {
       'Content-Type': 'application/json',
     },
@@ -13,5 +13,3 @@ export const createApiClient = (config?: ApiClientConfig) => {
 };
 
 export const apiClient = createApiClient();
-
-
