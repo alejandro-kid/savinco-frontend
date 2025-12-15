@@ -13,5 +13,3 @@ export const Card = ({ title, children }: CardProps) => {
     </section>
   );
 };
-
-

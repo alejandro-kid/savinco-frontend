@@ -1,4 +1,4 @@
-import type { SelectHTMLAttributes, ReactNode } from 'react';
+import type { ReactNode, SelectHTMLAttributes } from 'react';
 
 export interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   children: ReactNode;
@@ -14,5 +14,3 @@ export const Select = ({ children, ...props }: SelectProps) => {
     </select>
   );
 };
-
-
