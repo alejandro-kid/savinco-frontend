@@ -12,6 +12,6 @@ if (rootEl) {
       <Provider store={store}>
         <App />
       </Provider>
-    </React.StrictMode>,
+    </React.StrictMode>
   );
 }
