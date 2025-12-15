@@ -7,6 +7,5 @@ export interface ApiErrorResponse {
 
 export interface ApiClientConfig {
   baseURL?: string;
+  timeout?: number;
 }
-
-
