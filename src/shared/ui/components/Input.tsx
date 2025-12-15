@@ -10,5 +10,3 @@ export const Input = (props: InputProps) => {
     />
   );
 };
-
-
