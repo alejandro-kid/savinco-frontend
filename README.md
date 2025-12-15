@@ -98,7 +98,41 @@ El frontend consume la API REST documentada en `API_DOCUMENTATION.md`.
 6. `PUT /api/v1/financial-data/{countryCode}` - Actualizar datos
 7. `DELETE /api/v1/financial-data/{countryCode}` - Eliminar datos
 
-**Base URL**: `http://localhost:8080` (configurable)
+**Base URL**: `http://localhost:8080` (configurable via environment variables)
+
+## ⚙️ Configuración de Variables de Entorno
+
+Todas las variables de entorno están centralizadas en `src/shared/config/env.ts`. Para configurar el proyecto, crea un archivo `.env` en la raíz del proyecto basándote en `.env.example`:
+
+```bash
+# Copiar el archivo de ejemplo
+cp .env.example .env
+```
+
+### Variables Disponibles
+
+- **`VITE_API_BASE_URL`**: URL base del API backend (default: `http://localhost:8080/api/v1`)
+- **`VITE_API_TIMEOUT`**: Timeout de las peticiones API en milisegundos (default: `30000`)
+- **`VITE_APP_NAME`**: Nombre de la aplicación (default: `Savinco Frontend`)
+- **`VITE_APP_VERSION`**: Versión de la aplicación (default: `1.0.0`)
+
+### Uso en el Código
+
+Todas las variables de entorno se acceden a través del archivo de configuración centralizado:
+
+```typescript
+import { API_CONFIG, APP_CONFIG } from '@/shared/config/env';
+
+// Usar configuración de API
+const baseURL = API_CONFIG.BASE_URL;
+const timeout = API_CONFIG.TIMEOUT;
+
+// Usar configuración de aplicación
+const appName = APP_CONFIG.NAME;
+const isDev = APP_CONFIG.IS_DEV;
+```
+
+**Importante**: Nunca uses `import.meta.env` directamente en el código. Siempre usa el archivo de configuración centralizado para mantener un único punto de verdad.
 
 ## 🚀 Inicio Rápido
 
