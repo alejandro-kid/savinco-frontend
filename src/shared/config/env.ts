@@ -50,16 +50,16 @@ export const API_CONFIG = {
   /**
    * Base URL for the API backend
    * Default: http://localhost:8080/api/v1
-   * Can be overridden with VITE_API_BASE_URL environment variable
+   * Can be overridden with PUBLIC_API_BASE_URL environment variable
    */
-  BASE_URL: getEnv('VITE_API_BASE_URL', 'http://localhost:8080/api/v1'),
+  BASE_URL: getEnv('PUBLIC_API_BASE_URL', 'http://localhost:8080/api/v1'),
 
   /**
    * API timeout in milliseconds
    * Default: 30000 (30 seconds)
-   * Can be overridden with VITE_API_TIMEOUT environment variable
+   * Can be overridden with PUBLIC_API_TIMEOUT environment variable
    */
-  TIMEOUT: getEnvNumber('VITE_API_TIMEOUT', 30000),
+  TIMEOUT: getEnvNumber('PUBLIC_API_TIMEOUT', 30000),
 } as const;
 
 /**
@@ -69,12 +69,12 @@ export const APP_CONFIG = {
   /**
    * Application name
    */
-  NAME: getEnv('VITE_APP_NAME', 'Savinco Frontend'),
+  NAME: getEnv('PUBLIC_APP_NAME', 'Savinco Frontend'),
 
   /**
    * Application version
    */
-  VERSION: getEnv('VITE_APP_VERSION', '1.0.0'),
+  VERSION: getEnv('PUBLIC_APP_VERSION', '1.0.0'),
 
   /**
    * Whether the application is running in development mode
@@ -91,7 +91,30 @@ export const APP_CONFIG = {
  * Feature Flags (if needed in the future)
  */
 export const FEATURE_FLAGS = {
-  // Example: ENABLE_ANALYTICS: getEnvBoolean('VITE_ENABLE_ANALYTICS', false),
+  // Example: ENABLE_ANALYTICS: getEnvBoolean('PUBLIC_ENABLE_ANALYTICS', false),
+} as const;
+
+/**
+ * PostHog Configuration
+ * Used by PostHogProvider in the application root
+ * 
+ * Note: If PostHog variables are not set, analytics will be disabled gracefully
+ */
+export const POSTHOG_CONFIG = {
+  apiKey: import.meta.env.PUBLIC_POSTHOG_KEY || '',
+  options: {
+    api_host: import.meta.env.PUBLIC_POSTHOG_HOST || 'https://app.posthog.com',
+    defaults: '2025-05-24',
+    capture_exceptions: true, // Enables exception capture via Error Tracking
+    debug: APP_CONFIG.IS_DEV,
+  },
+  /**
+   * Whether PostHog is properly configured
+   * If false, analytics features will be disabled
+   */
+  isEnabled: Boolean(
+    import.meta.env.PUBLIC_POSTHOG_KEY && import.meta.env.PUBLIC_POSTHOG_HOST
+  ),
 } as const;
 
 /**
@@ -101,4 +124,5 @@ export const ENV = {
   API: API_CONFIG,
   APP: APP_CONFIG,
   FEATURES: FEATURE_FLAGS,
+  POSTHOG: POSTHOG_CONFIG,
 } as const;
