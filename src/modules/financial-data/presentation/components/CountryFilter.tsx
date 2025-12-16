@@ -1,5 +1,5 @@
-import { CountryCode } from '../../domain/types';
 import { Select } from '../../../../shared/ui/components/Select';
+import { CountryCode } from '../../domain/types';
 
 export type FilterOption = 'ALL' | CountryCode;
 

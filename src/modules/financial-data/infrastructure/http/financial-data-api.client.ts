@@ -6,8 +6,8 @@ import type {
   FinancialDataResponseDTO,
   FinancialDataSummaryResponseDTO,
 } from './dtos/financial-data-response.dto';
-import { mockFinancialDataApiClient } from './mocks/financial-data.mocks';
 import type { UpdateFinancialDataDTO } from './dtos/update-financial-data.dto';
+import { mockFinancialDataApiClient } from './mocks/financial-data.mocks';
 
 const BASE_PATH = '/api/v1/financial-data';
 
