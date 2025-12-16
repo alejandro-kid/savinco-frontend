@@ -8,6 +8,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
+import { formatCurrency } from '../../../../../shared/utils';
 import type { FinancialDataByCountrySummary } from '../../../domain/types';
 
 type CountryBreakdownChartProps = {
@@ -18,21 +19,11 @@ const THOUSAND_DIVISOR = 1000;
 
 const formatCurrencyInThousands = (value: number): string => {
   const valueInThousands = value / THOUSAND_DIVISOR;
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
+  return formatCurrency(valueInThousands, {
     maximumFractionDigits: 0,
     minimumFractionDigits: 0,
-  }).format(valueInThousands);
+  });
 };
-
-const formatCurrency = (value: number): string =>
-  new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 0,
-    minimumFractionDigits: 0,
-  }).format(value);
 
 export const CountryBreakdownChart = ({ data }: CountryBreakdownChartProps) => {
   const chartData = data.map((item) => ({
@@ -82,7 +73,10 @@ export const CountryBreakdownChart = ({ data }: CountryBreakdownChartProps) => {
               if (value === undefined) return '';
               // El valor ya viene dividido por 1000, así que lo multiplicamos de vuelta para mostrar el valor real
               const realValue = value * THOUSAND_DIVISOR;
-              return formatCurrency(realValue);
+              return formatCurrency(realValue, {
+                maximumFractionDigits: 0,
+                minimumFractionDigits: 0,
+              });
             }}
             contentStyle={{
               backgroundColor: '#fff',
