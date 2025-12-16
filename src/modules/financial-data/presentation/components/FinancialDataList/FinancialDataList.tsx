@@ -1,8 +1,8 @@
-import { Button } from '../../../../shared/ui/components/Button';
-import { Card } from '../../../../shared/ui/components/Card';
-import { ErrorMessage } from '../../../../shared/ui/components/ErrorMessage';
-import { LoadingSpinner } from '../../../../shared/ui/components/LoadingSpinner';
-import type { CountryCode, FinancialData } from '../../domain/types';
+import { Button } from '../../../../../shared/ui/components/Button';
+import { Card } from '../../../../../shared/ui/components/Card';
+import { ErrorMessage } from '../../../../../shared/ui/components/ErrorMessage';
+import { LoadingSpinner } from '../../../../../shared/ui/components/LoadingSpinner';
+import type { CountryCode, FinancialData } from '../../../domain/types';
 
 export interface FinancialDataListProps {
   items: Array<FinancialData>;

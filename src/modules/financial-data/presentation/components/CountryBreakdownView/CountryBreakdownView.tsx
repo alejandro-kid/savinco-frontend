@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Button } from '../../../../shared/ui/components/Button';
-import type { FinancialDataByCountrySummary } from '../../domain/types';
-import { CountryBreakdownChart } from './CountryBreakdownChart';
+import { Button } from '../../../../../shared/ui/components/Button';
+import type { FinancialDataByCountrySummary } from '../../../domain/types';
+import { CountryBreakdownChart } from '../CountryBreakdownChart';
 
 type ViewMode = 'table' | 'chart';
 

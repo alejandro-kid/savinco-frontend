@@ -8,7 +8,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import type { FinancialDataByCountrySummary } from '../../domain/types';
+import type { FinancialDataByCountrySummary } from '../../../domain/types';
 
 type CountryBreakdownChartProps = {
   data: Array<FinancialDataByCountrySummary>;

@@ -1,7 +1,7 @@
-import { Card } from '../../../../shared/ui/components/Card';
-import { ErrorMessage } from '../../../../shared/ui/components/ErrorMessage';
-import { LoadingSpinner } from '../../../../shared/ui/components/LoadingSpinner';
-import type { FinancialDataSummary } from '../../domain/types';
+import { Card } from '../../../../../shared/ui/components/Card';
+import { ErrorMessage } from '../../../../../shared/ui/components/ErrorMessage';
+import { LoadingSpinner } from '../../../../../shared/ui/components/LoadingSpinner';
+import type { FinancialDataSummary } from '../../../domain/types';
 
 export interface FinancialDataSummaryProps {
   summary: FinancialDataSummary | null;
