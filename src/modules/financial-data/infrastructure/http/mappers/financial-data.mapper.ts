@@ -7,14 +7,12 @@ import type {
   FinancialDataInput,
   FinancialDataSummary,
 } from '../../../domain/types';
-import type {
-  CreateFinancialDataDTO,
-  UpdateFinancialDataDTO,
-} from '../dtos/create-financial-data.dto';
+import type { CreateFinancialDataDTO } from '../dtos/create-financial-data.dto';
 import type {
   FinancialDataResponseDTO,
   FinancialDataSummaryResponseDTO,
 } from '../dtos/financial-data-response.dto';
+import type { UpdateFinancialDataDTO } from '../dtos/update-financial-data.dto';
 
 export const mapToCreateFinancialDataDTO = (input: FinancialDataInput): CreateFinancialDataDTO => ({
   countryCode: input.countryCode,
