@@ -1,21 +1,14 @@
-import { useState, useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../../../../shared/ui/components/Button';
 import { ErrorMessage } from '../../../../shared/ui/components/ErrorMessage';
 import { LoadingSpinner } from '../../../../shared/ui/components/LoadingSpinner';
-import { CountryCode, type FinancialDataByCountrySummary } from '../../domain/types';
+import type { FinancialDataByCountrySummary } from '../../domain/types';
+import { CountryBreakdownView } from '../components/CountryBreakdownView';
 import { CountryFilter, type FilterOption } from '../components/CountryFilter';
 import { FinancialMetricsCard } from '../components/FinancialMetricsCard';
 import { HomeHero } from '../components/HomeHero';
 import { useGetSummary } from '../hooks/use-get-summary';
-
-const formatCurrency = (value: number): string =>
-  new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 2,
-    minimumFractionDigits: 2,
-  }).format(value);
 
 export const HomePage = () => {
   const navigate = useNavigate();
@@ -43,9 +36,9 @@ export const HomePage = () => {
     }
 
     // Filtrar por país específico
-    const countryData = summary.byCountry.find(
-      (item) => item.countryCode === filter
-    ) as FinancialDataByCountrySummary | undefined;
+    const countryData = summary.byCountry.find((item) => item.countryCode === filter) as
+      | FinancialDataByCountrySummary
+      | undefined;
 
     if (!countryData) {
       return {
@@ -74,17 +67,17 @@ export const HomePage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
         {/* Hero Section */}
         <HomeHero />
 
         {/* Filter Section */}
-        <div className="mb-8 flex flex-col items-center justify-between gap-4 sm:flex-row">
+        <div className="mb-6 flex flex-col items-stretch gap-4 sm:mb-8 sm:flex-row sm:items-center sm:justify-between">
           <CountryFilter value={filter} onChange={setFilter} disabled={isLoading} />
           <Button
             onClick={() => navigate('/dashboard')}
             variant="primary"
-            className="w-full sm:w-auto"
+            className="w-full sm:w-auto sm:flex-shrink-0"
           >
             Ir al Dashboard
           </Button>
@@ -108,25 +101,28 @@ export const HomePage = () => {
         {!isLoading && !error && summary ? (
           <>
             {filteredCountryName ? (
-              <div className="mb-6 text-center">
-                <h2 className="text-2xl font-semibold text-gray-800">
+              <div className="mb-4 text-center sm:mb-6">
+                <h2 className="text-xl font-semibold text-gray-800 sm:text-2xl">
                   Datos de {filteredCountryName}
                 </h2>
               </div>
             ) : null}
 
-            <div className="mb-8 grid gap-6 sm:grid-cols-1 md:grid-cols-3">
+            <div className="mb-6 grid gap-4 sm:gap-6 sm:grid-cols-1 md:grid-cols-3">
               <FinancialMetricsCard
                 title="Capital Ahorrado"
                 value={metrics.capitalSaved}
                 color="blue"
                 icon={
                   <svg
-                    className="h-8 w-8"
+                    width="24"
+                    height="24"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
                     xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true"
+                    className="flex-shrink-0"
                   >
                     <path
                       strokeLinecap="round"
@@ -143,11 +139,14 @@ export const HomePage = () => {
                 color="indigo"
                 icon={
                   <svg
-                    className="h-8 w-8"
+                    width="24"
+                    height="24"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
                     xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true"
+                    className="flex-shrink-0"
                   >
                     <path
                       strokeLinecap="round"
@@ -164,11 +163,14 @@ export const HomePage = () => {
                 color="emerald"
                 icon={
                   <svg
-                    className="h-8 w-8"
+                    width="24"
+                    height="24"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
                     xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true"
+                    className="flex-shrink-0"
                   >
                     <path
                       strokeLinecap="round"
@@ -183,18 +185,21 @@ export const HomePage = () => {
 
             {/* Grand Total Card (solo si es "Todos") */}
             {filter === 'ALL' ? (
-              <div className="mb-8">
+              <div className="mb-6 sm:mb-8">
                 <FinancialMetricsCard
                   title="Total Global"
                   value={metrics.grandTotal}
                   color="purple"
                   icon={
                     <svg
-                      className="h-8 w-8"
+                      width="24"
+                      height="24"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
                       xmlns="http://www.w3.org/2000/svg"
+                      aria-hidden="true"
+                      className="flex-shrink-0"
                     >
                       <path
                         strokeLinecap="round"
@@ -208,63 +213,12 @@ export const HomePage = () => {
               </div>
             ) : null}
 
-            {/* Country Breakdown Table (solo si es "Todos") */}
+            {/* Country Breakdown (solo si es "Todos") */}
             {filter === 'ALL' && summary.byCountry.length > 0 ? (
-              <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-                <h3 className="mb-4 text-lg font-semibold text-gray-800">Desglose por País</h3>
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                          País
-                        </th>
-                        <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">
-                          Capital Ahorrado
-                        </th>
-                        <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">
-                          Capital Prestado
-                        </th>
-                        <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">
-                          Utilidades
-                        </th>
-                        <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">
-                          Total
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-200 bg-white">
-                      {summary.byCountry.map((item) => {
-                        const total = item.capitalSaved + item.capitalLoaned + item.profitsGenerated;
-                        return (
-                          <tr
-                            key={item.countryCode}
-                            className="hover:bg-gray-50 transition-colors cursor-pointer"
-                            onClick={() => setFilter(item.countryCode)}
-                          >
-                            <td className="whitespace-nowrap px-4 py-4">
-                              <div className="font-medium text-gray-900">{item.countryName}</div>
-                              <div className="text-sm text-gray-500">{item.countryCode}</div>
-                            </td>
-                            <td className="whitespace-nowrap px-4 py-4 text-right text-sm text-gray-700">
-                              {formatCurrency(item.capitalSaved)}
-                            </td>
-                            <td className="whitespace-nowrap px-4 py-4 text-right text-sm text-gray-700">
-                              {formatCurrency(item.capitalLoaned)}
-                            </td>
-                            <td className="whitespace-nowrap px-4 py-4 text-right text-sm text-gray-700">
-                              {formatCurrency(item.profitsGenerated)}
-                            </td>
-                            <td className="whitespace-nowrap px-4 py-4 text-right text-sm font-semibold text-gray-900">
-                              {formatCurrency(total)}
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+              <CountryBreakdownView
+                data={summary.byCountry}
+                onCountryClick={(countryCode) => setFilter(countryCode as FilterOption)}
+              />
             ) : null}
           </>
         ) : null}
