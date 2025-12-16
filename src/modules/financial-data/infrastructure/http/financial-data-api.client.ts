@@ -1,3 +1,4 @@
+import { APP_CONFIG } from '../../../../shared/config/env';
 import { apiClient } from '../../../../shared/http/api-client';
 import type { CountryCode } from '../../domain/types';
 import type { CreateFinancialDataDTO } from './dtos/create-financial-data.dto';
@@ -5,11 +6,15 @@ import type {
   FinancialDataResponseDTO,
   FinancialDataSummaryResponseDTO,
 } from './dtos/financial-data-response.dto';
+import { mockFinancialDataApiClient } from './mocks/financial-data.mocks';
 import type { UpdateFinancialDataDTO } from './dtos/update-financial-data.dto';
 
 const BASE_PATH = '/api/v1/financial-data';
 
-export const financialDataApiClient = {
+/**
+ * Real API client implementation
+ */
+const realFinancialDataApiClient = {
   create: async (payload: CreateFinancialDataDTO): Promise<FinancialDataResponseDTO> => {
     const response = await apiClient.post<FinancialDataResponseDTO>(BASE_PATH, payload);
     return response.data;
@@ -45,3 +50,11 @@ export const financialDataApiClient = {
     return response.data;
   },
 };
+
+/**
+ * Financial Data API Client
+ * Uses mock data in development mode, real API in production
+ */
+export const financialDataApiClient = APP_CONFIG.IS_DEV
+  ? mockFinancialDataApiClient
+  : realFinancialDataApiClient;
