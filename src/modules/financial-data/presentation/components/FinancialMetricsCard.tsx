@@ -1,5 +1,3 @@
-import { Card } from '../../../../shared/ui/components/Card';
-
 export interface FinancialMetricsCardProps {
   title: string;
   value: number;
@@ -52,17 +50,21 @@ export const FinancialMetricsCard = ({
 
   return (
     <div
-      className={`rounded-xl border-2 ${colors.border} ${colors.bg} p-6 transition-all duration-200 hover:shadow-lg`}
+      className={`rounded-xl border-2 ${colors.border} ${colors.bg} p-5 transition-all duration-200 hover:shadow-lg`}
     >
       <div className="flex items-start justify-between">
-        <div className="flex-1">
-          <div className={`mb-2 text-sm font-medium uppercase ${colors.text}`}>{title}</div>
-          <div className={`text-2xl font-bold ${colors.value} md:text-3xl`}>
+        <div className="flex-1 min-w-0">
+          <div className={`mb-2 text-xs font-medium uppercase tracking-wide ${colors.text}`}>
+            {title}
+          </div>
+          <div className={`text-xl font-bold ${colors.value} sm:text-2xl md:text-2xl break-words`}>
             {formatCurrency(value)}
           </div>
         </div>
         {icon ? (
-          <div className={`ml-4 flex-shrink-0 ${colors.text} opacity-70`}>{icon}</div>
+          <div className={`ml-3 flex-shrink-0 ${colors.text} opacity-70 flex items-center`}>
+            {icon}
+          </div>
         ) : null}
       </div>
     </div>

@@ -1,5 +1,8 @@
 import { CountryCode, CurrencyCode } from '../../../domain/types';
-import type { FinancialDataResponseDTO, FinancialDataSummaryResponseDTO } from '../dtos/financial-data-response.dto';
+import type {
+  FinancialDataResponseDTO,
+  FinancialDataSummaryResponseDTO,
+} from '../dtos/financial-data-response.dto';
 
 /**
  * Mock data for development
