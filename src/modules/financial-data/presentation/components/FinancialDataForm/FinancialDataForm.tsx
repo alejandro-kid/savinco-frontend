@@ -1,10 +1,10 @@
 import type { FormEvent } from 'react';
 import { useState } from 'react';
-import { Button } from '../../../../shared/ui/components/Button';
-import { ErrorMessage } from '../../../../shared/ui/components/ErrorMessage';
-import { Input } from '../../../../shared/ui/components/Input';
-import { CountryCode, CurrencyCode, type FinancialDataInput } from '../../domain/types';
-import { CountryCodeSelect } from './CountryCodeSelect';
+import { Button } from '../../../../../shared/ui/components/Button';
+import { ErrorMessage } from '../../../../../shared/ui/components/ErrorMessage';
+import { Input } from '../../../../../shared/ui/components/Input';
+import { CountryCode, CurrencyCode, type FinancialDataInput } from '../../../domain/types';
+import { CountryCodeSelect } from '../CountryCodeSelect';
 
 export interface FinancialDataFormProps {
   initialValue?: FinancialDataInput;

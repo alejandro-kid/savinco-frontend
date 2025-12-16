@@ -1,6 +1,6 @@
 import type { SelectHTMLAttributes } from 'react';
-import { Select } from '../../../../shared/ui/components/Select';
-import { CountryCode } from '../../domain/types';
+import { Select } from '../../../../../shared/ui/components/Select';
+import { CountryCode } from '../../../domain/types';
 
 export type CountryCodeSelectProps = SelectHTMLAttributes<HTMLSelectElement>;
 
