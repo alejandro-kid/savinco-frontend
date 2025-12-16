@@ -1,5 +1,6 @@
 import {
   CountryCode,
+  type CountryName,
   type CurrencyCode,
   type FinancialData,
   type FinancialDataByCountrySummary,
@@ -13,7 +14,7 @@ import {
   ensureValidCurrencyCode,
 } from './validations';
 
-const COUNTRY_NAME_MAP: Record<CountryCode, string> = {
+const COUNTRY_NAME_MAP: Record<CountryCode, CountryName> = {
   [CountryCode.ECU]: 'Ecuador',
   [CountryCode.ESP]: 'España',
   [CountryCode.PER]: 'Perú',
