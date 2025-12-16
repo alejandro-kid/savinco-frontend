@@ -2,6 +2,7 @@ import { Button } from '../../../../../shared/ui/components/Button';
 import { Card } from '../../../../../shared/ui/components/Card';
 import { ErrorMessage } from '../../../../../shared/ui/components/ErrorMessage';
 import { LoadingSpinner } from '../../../../../shared/ui/components/LoadingSpinner';
+import { formatCurrency } from '../../../../../shared/utils';
 import type { CountryCode, FinancialData } from '../../../domain/types';
 
 export interface FinancialDataListProps {
@@ -14,13 +15,6 @@ export interface FinancialDataListProps {
   onDeleteClick: (countryCode: CountryCode) => void;
   onRetry?: () => void;
 }
-
-const formatCurrency = (value: number): string =>
-  new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 2,
-  }).format(value);
 
 export const FinancialDataList = ({
   items,

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Button } from '../../../../../shared/ui/components/Button';
+import { formatCurrency } from '../../../../../shared/utils';
 import type { FinancialDataByCountrySummary } from '../../../domain/types';
 import { CountryBreakdownChart } from '../CountryBreakdownChart';
 
@@ -9,14 +10,6 @@ type CountryBreakdownViewProps = {
   data: Array<FinancialDataByCountrySummary>;
   onCountryClick?: (countryCode: string) => void;
 };
-
-const formatCurrency = (value: number): string =>
-  new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 2,
-    minimumFractionDigits: 2,
-  }).format(value);
 
 export const CountryBreakdownView = ({ data, onCountryClick }: CountryBreakdownViewProps) => {
   const [viewMode, setViewMode] = useState<ViewMode>('table');

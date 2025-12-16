@@ -1,6 +1,7 @@
 import { Card } from '../../../../../shared/ui/components/Card';
 import { ErrorMessage } from '../../../../../shared/ui/components/ErrorMessage';
 import { LoadingSpinner } from '../../../../../shared/ui/components/LoadingSpinner';
+import { formatCurrency } from '../../../../../shared/utils';
 import type { FinancialDataSummary } from '../../../domain/types';
 
 export interface FinancialDataSummaryProps {
@@ -8,13 +9,6 @@ export interface FinancialDataSummaryProps {
   isLoading: boolean;
   error: string | null;
 }
-
-const formatCurrency = (value: number): string =>
-  new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 2,
-  }).format(value);
 
 export const FinancialDataSummaryComponent = ({
   summary,
