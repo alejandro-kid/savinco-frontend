@@ -1,0 +1,68 @@
+services:
+  financial-backend:
+    # Use latest or specific SHA tag (e.g., :latest or :<sha>)
+    image: ghcr.io/alejandro-kid/savinco-backend/financial-backend:latest
+    container_name: financial-backend
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - APP_NAME=financial-backend
+      - SERVER_PORT=8080
+      - DATABASE_URL=${DATABASE_URL}
+      - DATABASE_USERNAME=${DATABASE_USERNAME}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - DATABASE_DRIVER=org.postgresql.Driver
+      - JPA_DDL_AUTO=validate
+      - JPA_SHOW_SQL=false
+      - HIBERNATE_DIALECT=org.hibernate.dialect.PostgreSQLDialect
+      - HIBERNATE_FORMAT_SQL=false
+      - SWAGGER_ENABLED=true
+      - SWAGGER_API_DOCS_PATH=/api-docs
+      - SWAGGER_UI_PATH=/swagger-ui.html
+      - ACTUATOR_ENDPOINTS=health,info
+      - ACTUATOR_HEALTH_DETAILS=when-authorized
+      - LOG_LEVEL_ROOT=INFO
+      - LOG_LEVEL_APP=INFO
+      - LOG_LEVEL_SPRING_WEB=INFO
+      - LOG_LEVEL_HIBERNATE_SQL=WARN
+    networks:
+      - savinco-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  savinco-front:
+    # Use pre-built image from CI/CD
+    # image: ghcr.io/alejandro-kid/savinco-front/savinco-front:latest
+    # Uncomment below and comment image above to build locally
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: savinco-front
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    environment:
+      # Runtime environment variables (injected at container startup, not build time)
+      # These are safe to distribute as they're not embedded in the image
+      # Configure these via .env file or environment variables
+      - PUBLIC_API_BASE_URL=${PUBLIC_API_BASE_URL:-http://financial-backend:8080}
+      - PUBLIC_API_TIMEOUT=${PUBLIC_API_TIMEOUT:-30000}
+      - PUBLIC_APP_NAME=${PUBLIC_APP_NAME:-Savinco Frontend}
+      - PUBLIC_APP_VERSION=${PUBLIC_APP_VERSION:-1.0.0}
+      # Optional: PostHog configuration
+      - PUBLIC_POSTHOG_KEY=${PUBLIC_POSTHOG_KEY:-}
+      - PUBLIC_POSTHOG_HOST=${PUBLIC_POSTHOG_HOST:-https://app.posthog.com}
+    depends_on:
+      financial-backend:
+        condition: service_healthy
+    networks:
+      - savinco-network
+
+networks:
+  savinco-network:
+    driver: bridge

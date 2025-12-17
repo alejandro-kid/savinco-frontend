@@ -1,0 +1,50 @@
+# Dependencies
+node_modules
+# Note: pnpm-lock.yaml is needed for --frozen-lockfile, so we don't ignore it
+
+# Build output (will be generated in container)
+dist
+
+# Git
+.git
+.gitignore
+
+# IDE
+.vscode
+.idea
+.cursor
+
+# Documentation
+*.md
+!README.md
+
+# CI/CD
+.github
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test files
+coverage
+.nyc_output
+
+# Misc
+AGENTS.md
+TODO.md
+ci-cd.yml
+
+# Keep docker-entrypoint.sh (needed for runtime env injection)
+!docker-entrypoint.sh
