@@ -1,6 +1,8 @@
 import { useMemo } from 'react';
 import { getAllEntities } from './entities-config';
 import { useGetAllFinancialData } from '../../modules/financial-data/presentation/hooks/use-get-all-financial-data';
+import { useGetAllCurrencies } from '../../modules/currency/presentation/hooks/use-get-all-currencies';
+import { useGetAllCountries } from '../../modules/country/presentation/hooks/use-get-all-countries';
 import type { DashboardEntity } from '../../modules/financial-data/presentation/components/DashboardLayout';
 
 /**
@@ -12,8 +14,10 @@ import type { DashboardEntity } from '../../modules/financial-data/presentation/
  * - Retornar el formato esperado por DashboardLayout
  */
 export const useDashboardEntities = (): Array<DashboardEntity> => {
-  // Obtener datos de financial-data para el badge
+  // Obtener datos de todas las entidades para los badges
   const { items: financialDataItems } = useGetAllFinancialData();
+  const { items: currencyItems } = useGetAllCurrencies();
+  const { items: countryItems } = useGetAllCountries();
 
   return useMemo(() => {
     const entitiesConfig = getAllEntities();
@@ -23,11 +27,11 @@ export const useDashboardEntities = (): Array<DashboardEntity> => {
       let badge: number | undefined;
       if (config.id === 'financial-data') {
         badge = financialDataItems.length;
+      } else if (config.id === 'currency') {
+        badge = currencyItems.length;
+      } else if (config.id === 'country') {
+        badge = countryItems.length;
       }
-      // Aquí puedes agregar más lógica para otras entidades:
-      // else if (config.id === 'users') {
-      //   badge = usersItems.length;
-      // }
 
       return {
         id: config.id,
@@ -37,5 +41,5 @@ export const useDashboardEntities = (): Array<DashboardEntity> => {
         badge,
       };
     });
-  }, [financialDataItems.length]);
+  }, [financialDataItems.length, currencyItems.length, countryItems.length]);
 };
