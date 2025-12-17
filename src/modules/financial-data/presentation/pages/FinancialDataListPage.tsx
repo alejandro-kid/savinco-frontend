@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { TrackedPage } from '../../../../shared/analytics';
+import { useDashboardEntities } from '../../../../shared/dashboard';
 import { ErrorMessage } from '../../../../shared/ui/components/ErrorMessage';
 import { LoadingSpinner } from '../../../../shared/ui/components/LoadingSpinner';
 import type { CountryCode, FinancialDataInput } from '../../domain/types';
-import { DashboardLayout, type DashboardEntity } from '../components/DashboardLayout';
+import { DashboardLayout } from '../components/DashboardLayout';
 import { FinancialDataCard } from '../components/FinancialDataCard';
 import { FinancialDataModal } from '../components/FinancialDataModal';
 import { useCreateFinancialData } from '../hooks/use-create-financial-data';
@@ -24,32 +25,8 @@ export const FinancialDataListPage = () => {
   const [editingCountryCode, setEditingCountryCode] = useState<CountryCode | null>(null);
   const [editingData, setEditingData] = useState<FinancialDataInput | null>(null);
 
-  // Definir entidades para el sidebar (por ahora solo Financial Data, pero preparado para más)
-  const entities: Array<DashboardEntity> = [
-    {
-      id: 'financial-data',
-      label: 'Datos Financieros',
-      path: '/dashboard',
-      badge: items.length,
-      icon: (
-        <svg
-          width="20"
-          height="20"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
-        </svg>
-      ),
-    },
-  ];
+  // Obtener entidades del dashboard desde la configuración centralizada
+  const entities = useDashboardEntities();
 
   const handleCreateClick = () => {
     setIsCreateModalOpen(true);
@@ -76,7 +53,7 @@ export const FinancialDataListPage = () => {
           profitsGenerated: data.profitsGenerated,
         });
       }
-    } catch (err) {
+    } catch {
       // Error ya está manejado por el hook
       setIsEditModalOpen(false);
     }
@@ -132,6 +109,7 @@ export const FinancialDataListPage = () => {
                   type="button"
                   onClick={reload}
                   className="rounded-lg bg-red-600 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-red-700"
+                  aria-label="Reintentar carga de datos"
                 >
                   Reintentar
                 </button>
@@ -150,7 +128,7 @@ export const FinancialDataListPage = () => {
         {/* Empty State */}
         {!isLoading && !errorMessage && items.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-gray-100">
+            <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-gray-100" aria-label="Icono de datos financieros vacíos">
               <svg
                 width="40"
                 height="40"
@@ -173,6 +151,7 @@ export const FinancialDataListPage = () => {
               Comienza agregando datos financieros para un país.
             </p>
             <button
+              type="button"
               onClick={handleCreateClick}
               className="rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-2.5 text-sm font-semibold text-white shadow-md transition-all duration-200 hover:from-blue-700 hover:to-indigo-700 hover:shadow-lg"
             >
