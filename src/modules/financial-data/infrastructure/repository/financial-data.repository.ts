@@ -27,11 +27,7 @@ export const financialDataRepository: FinancialDataRepository = {
       store.dispatch(financialDataActions.mutationEnded());
       return financialData;
     } catch (error) {
-      store.dispatch(
-        financialDataActions.mutationFailed(
-          error instanceof Error ? error.message : 'Unknown error while creating data'
-        )
-      );
+      store.dispatch(financialDataActions.mutationFailed('No se pudieron cargar los datos'));
       throw error;
     }
   },
@@ -46,11 +42,7 @@ export const financialDataRepository: FinancialDataRepository = {
       store.dispatch(financialDataActions.mutationEnded());
       return financialData;
     } catch (error) {
-      store.dispatch(
-        financialDataActions.mutationFailed(
-          error instanceof Error ? error.message : 'Unknown error while updating data'
-        )
-      );
+      store.dispatch(financialDataActions.mutationFailed('No se pudieron cargar los datos'));
       throw error;
     }
   },
@@ -62,11 +54,7 @@ export const financialDataRepository: FinancialDataRepository = {
       await financialDataApiClient.delete(countryCode);
     } catch (error) {
       // Rollback strategy (simple version: refetch list)
-      store.dispatch(
-        financialDataActions.mutationFailed(
-          error instanceof Error ? error.message : 'Unknown error while deleting data'
-        )
-      );
+      store.dispatch(financialDataActions.mutationFailed('No se pudieron cargar los datos'));
       // The calling use case will decide whether to refetch list/summary.
       throw error;
     }
@@ -80,11 +68,7 @@ export const financialDataRepository: FinancialDataRepository = {
       store.dispatch(financialDataActions.requestListSucceeded(items));
       return items;
     } catch (error) {
-      store.dispatch(
-        financialDataActions.requestListFailed(
-          error instanceof Error ? error.message : 'Unknown error while fetching list'
-        )
-      );
+      store.dispatch(financialDataActions.requestListFailed('No se pudieron cargar los datos'));
       throw error;
     }
   },
@@ -102,11 +86,7 @@ export const financialDataRepository: FinancialDataRepository = {
       store.dispatch(financialDataActions.requestSummarySucceeded(summary));
       return summary;
     } catch (error) {
-      store.dispatch(
-        financialDataActions.requestSummaryFailed(
-          error instanceof Error ? error.message : 'Unknown error while fetching summary'
-        )
-      );
+      store.dispatch(financialDataActions.requestSummaryFailed('No se pudieron cargar los datos'));
       throw error;
     }
   },

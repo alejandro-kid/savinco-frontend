@@ -16,11 +16,7 @@ export const countryRepository: CountryRepository = {
       store.dispatch(countryActions.mutationEnded());
       return country;
     } catch (error) {
-      store.dispatch(
-        countryActions.mutationFailed(
-          error instanceof Error ? error.message : 'Unknown error while creating country'
-        )
-      );
+      store.dispatch(countryActions.mutationFailed('No se pudieron cargar los datos'));
       throw error;
     }
   },
@@ -33,11 +29,7 @@ export const countryRepository: CountryRepository = {
       store.dispatch(countryActions.requestSucceeded(items));
       return items;
     } catch (error) {
-      store.dispatch(
-        countryActions.requestFailed(
-          error instanceof Error ? error.message : 'Unknown error while fetching countries'
-        )
-      );
+      store.dispatch(countryActions.requestFailed('No se pudieron cargar los datos'));
       throw error;
     }
   },
