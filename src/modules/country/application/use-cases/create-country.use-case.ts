@@ -1,4 +1,4 @@
-import type { Country, CreateCountryInput, CountryRepository } from '../../domain';
+import type { Country, CountryRepository, CreateCountryInput } from '../../domain';
 
 export const createCountryUseCase = async (
   countryRepository: CountryRepository,

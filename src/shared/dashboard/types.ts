@@ -3,7 +3,11 @@ import type { ReactNode } from 'react';
 /**
  * Configuración de una entidad del dashboard
  */
-export interface DashboardEntityConfig<TItem = unknown, TCreateInput = unknown, TUpdateInput = unknown> {
+export interface DashboardEntityConfig<
+  _TItem = unknown,
+  _TCreateInput = unknown,
+  _TUpdateInput = unknown,
+> {
   /** ID único de la entidad */
   id: string;
   /** Etiqueta mostrada en el sidebar */

@@ -1,2 +1,2 @@
-export { CountryCard } from './CountryCard';
 export type { CountryCardProps } from './CountryCard';
+export { CountryCard } from './CountryCard';

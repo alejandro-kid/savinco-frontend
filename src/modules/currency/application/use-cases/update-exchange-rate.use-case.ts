@@ -1,4 +1,4 @@
-import type { Currency, UpdateExchangeRateInput, CurrencyRepository } from '../../domain';
+import type { Currency, CurrencyRepository, UpdateExchangeRateInput } from '../../domain';
 
 export const updateExchangeRateUseCase = async (
   currencyRepository: CurrencyRepository,

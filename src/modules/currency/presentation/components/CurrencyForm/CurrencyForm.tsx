@@ -36,7 +36,7 @@ export const CurrencyForm = ({
     }
 
     const exchangeRate = parseFloat(exchangeRateToBase);
-    if (isNaN(exchangeRate) || exchangeRate <= 0) {
+    if (Number.isNaN(exchangeRate) || exchangeRate <= 0) {
       return;
     }
 
@@ -61,9 +61,7 @@ export const CurrencyForm = ({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {errorMessage ? (
-        <ErrorMessage>{errorMessage}</ErrorMessage>
-      ) : null}
+      {errorMessage ? <ErrorMessage>{errorMessage}</ErrorMessage> : null}
 
       <div>
         <label htmlFor="code" className="mb-1 block text-sm font-medium text-gray-700">
@@ -74,7 +72,10 @@ export const CurrencyForm = ({
           type="text"
           value={code}
           onChange={(e) => {
-            const value = e.target.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 3);
+            const value = e.target.value
+              .toUpperCase()
+              .replace(/[^A-Z]/g, '')
+              .slice(0, 3);
             setCode(value);
           }}
           placeholder="USD, EUR, PEN, NPR"

@@ -104,7 +104,7 @@ export const FEATURE_FLAGS = {
 /**
  * PostHog Configuration
  * Used by PostHogProvider in the application root
- * 
+ *
  * Note: If PostHog variables are not set, analytics will be disabled gracefully
  */
 export const POSTHOG_CONFIG = {
@@ -119,9 +119,7 @@ export const POSTHOG_CONFIG = {
    * Whether PostHog is properly configured
    * If false, analytics features will be disabled
    */
-  isEnabled: Boolean(
-    import.meta.env.PUBLIC_POSTHOG_KEY && import.meta.env.PUBLIC_POSTHOG_HOST
-  ),
+  isEnabled: Boolean(import.meta.env.PUBLIC_POSTHOG_KEY && import.meta.env.PUBLIC_POSTHOG_HOST),
 } as const;
 
 /**
