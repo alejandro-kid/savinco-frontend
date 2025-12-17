@@ -1,10 +1,8 @@
-import { Button } from '../../../../../shared/ui/components/Button';
 import { Card } from '../../../../../shared/ui/components/Card';
 import type { Country, CountryCode } from '../../../domain/types';
 
 export interface CountryCardProps {
   item: Country;
-  isProcessing?: boolean;
 }
 
 const getCountryFlag = (countryCode: CountryCode): string => {
@@ -17,7 +15,7 @@ const getCountryFlag = (countryCode: CountryCode): string => {
   return flags[countryCode] || '🌍';
 };
 
-export const CountryCard = ({ item, isProcessing = false }: CountryCardProps) => {
+export const CountryCard = ({ item }: CountryCardProps) => {
   return (
     <Card className="group relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-[1.02]">
       <div className="relative">

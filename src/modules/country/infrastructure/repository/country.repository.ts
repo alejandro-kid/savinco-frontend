@@ -17,7 +17,9 @@ export const countryRepository: CountryRepository = {
       return country;
     } catch (error) {
       store.dispatch(
-        countryActions.mutationFailed(error instanceof Error ? error.message : 'Unknown error while creating country')
+        countryActions.mutationFailed(
+          error instanceof Error ? error.message : 'Unknown error while creating country'
+        )
       );
       throw error;
     }
@@ -32,7 +34,9 @@ export const countryRepository: CountryRepository = {
       return items;
     } catch (error) {
       store.dispatch(
-        countryActions.requestFailed(error instanceof Error ? error.message : 'Unknown error while fetching countries')
+        countryActions.requestFailed(
+          error instanceof Error ? error.message : 'Unknown error while fetching countries'
+        )
       );
       throw error;
     }
@@ -44,7 +48,7 @@ export const countryRepository: CountryRepository = {
       const country = mapCountryFromDTO(response);
       store.dispatch(countryActions.upsertCountry(country));
       return country;
-    } catch (error) {
+    } catch (_error) {
       return null;
     }
   },

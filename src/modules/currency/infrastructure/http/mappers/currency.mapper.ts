@@ -1,5 +1,9 @@
-import type { Currency, CreateCurrencyInput, UpdateExchangeRateInput } from '../../../domain/types';
-import type { CurrencyResponseDTO, CreateCurrencyDTO, UpdateExchangeRateDTO } from '../dtos/currency-response.dto';
+import type { CreateCurrencyInput, Currency, UpdateExchangeRateInput } from '../../../domain/types';
+import type {
+  CreateCurrencyDTO,
+  CurrencyResponseDTO,
+  UpdateExchangeRateDTO,
+} from '../dtos/currency-response.dto';
 
 export const mapCurrencyFromDTO = (dto: CurrencyResponseDTO): Currency => {
   return {
@@ -22,7 +26,9 @@ export const mapCurrencyToCreateDTO = (input: CreateCurrencyInput): CreateCurren
   };
 };
 
-export const mapUpdateExchangeRateToDTO = (input: UpdateExchangeRateInput): UpdateExchangeRateDTO => {
+export const mapUpdateExchangeRateToDTO = (
+  input: UpdateExchangeRateInput
+): UpdateExchangeRateDTO => {
   return {
     exchangeRateToBase: input.exchangeRateToBase,
   };

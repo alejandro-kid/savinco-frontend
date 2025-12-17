@@ -1,5 +1,3 @@
-import type { ReactNode } from 'react';
-import { Button } from '../../../../../shared/ui/components/Button';
 import { Card } from '../../../../../shared/ui/components/Card';
 import { CurrencyForm, type CurrencyFormProps } from '../CurrencyForm';
 
@@ -27,7 +25,7 @@ export const CurrencyModal = ({
   const handleSubmit = async (value: Parameters<typeof onSubmit>[0]) => {
     try {
       await onSubmit(value);
-    } catch (error) {
+    } catch (_error) {
       // Error ya está manejado por el componente padre
     }
   };
@@ -38,6 +36,7 @@ export const CurrencyModal = ({
         <div className="mb-6 flex items-center justify-between border-b border-gray-200 pb-4">
           <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
           <button
+            type="button"
             onClick={onClose}
             className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
             aria-label="Cerrar"
@@ -49,7 +48,9 @@ export const CurrencyModal = ({
               stroke="currentColor"
               viewBox="0 0 24 24"
               xmlns="http://www.w3.org/2000/svg"
+              aria-label="Cerrar"
             >
+              <title>Cerrar</title>
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"

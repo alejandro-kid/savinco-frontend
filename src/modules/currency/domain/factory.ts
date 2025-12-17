@@ -1,4 +1,4 @@
-import type { Currency, CreateCurrencyInput } from './types';
+import type { CreateCurrencyInput, Currency } from './types';
 
 /**
  * Creates a valid currency entity.
@@ -11,7 +11,11 @@ export const createCurrency = (currency: Currency): Currency => {
 /**
  * Creates a currency from input data (typically from API).
  */
-export const createCurrencyFromInput = (input: CreateCurrencyInput, id: number, timestamps: { createdAt: string; updatedAt: string }): Currency => {
+export const createCurrencyFromInput = (
+  input: CreateCurrencyInput,
+  id: number,
+  timestamps: { createdAt: string; updatedAt: string }
+): Currency => {
   const currency: Currency = {
     id,
     code: input.code,

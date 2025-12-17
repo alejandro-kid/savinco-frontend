@@ -8,7 +8,9 @@
     "dev": "rsbuild dev --open",
     "preview": "rsbuild preview",
     "lint": "biome check src",
-    "lint:fix": "biome check src --write"
+    "lint:fix": "biome check src --write",
+    "typecheck": "tsc --noEmit",
+    "check": "pnpm typecheck && pnpm lint"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.11.2",

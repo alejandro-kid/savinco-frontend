@@ -45,7 +45,9 @@ export const DashboardLayout = ({
               stroke="currentColor"
               viewBox="0 0 24 24"
               xmlns="http://www.w3.org/2000/svg"
+              aria-label="Logo Savinco"
             >
+              <title>Logo Savinco</title>
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -125,7 +127,9 @@ export const DashboardLayout = ({
               stroke="currentColor"
               viewBox="0 0 24 24"
               xmlns="http://www.w3.org/2000/svg"
+              aria-label="Ir al inicio"
             >
+              <title>Ir al inicio</title>
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -149,6 +153,7 @@ export const DashboardLayout = ({
               <span className="text-sm text-gray-600">Gestión de datos</span>
             </div>
             <button
+              type="button"
               onClick={onCreateClick}
               className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition-all duration-200 hover:from-blue-700 hover:to-indigo-700 hover:shadow-lg active:scale-95"
             >
@@ -159,7 +164,9 @@ export const DashboardLayout = ({
                 stroke="currentColor"
                 viewBox="0 0 24 24"
                 xmlns="http://www.w3.org/2000/svg"
+                aria-label="Agregar"
               >
+                <title>Agregar</title>
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"

@@ -1,7 +1,6 @@
-import { APP_CONFIG } from '../../../../shared/config/env';
 import { apiClient } from '../../../../shared/http/api-client';
 import type { CountryCode } from '../../domain/types';
-import type { CreateCountryDTO, CountryResponseDTO } from './dtos/country-response.dto';
+import type { CountryResponseDTO, CreateCountryDTO } from './dtos/country-response.dto';
 
 const BASE_PATH = '/countries';
 

@@ -56,11 +56,15 @@ export const FinancialDataCard = ({
           </div>
           <div className="rounded-lg bg-white/60 p-3 backdrop-blur-sm">
             <p className="mb-1 text-xs font-medium text-gray-600">Capital Prestado</p>
-            <p className="text-base font-bold text-indigo-600">{formatCurrency(item.capitalLoaned)}</p>
+            <p className="text-base font-bold text-indigo-600">
+              {formatCurrency(item.capitalLoaned)}
+            </p>
           </div>
           <div className="rounded-lg bg-white/60 p-3 backdrop-blur-sm">
             <p className="mb-1 text-xs font-medium text-gray-600">Utilidades</p>
-            <p className="text-base font-bold text-emerald-600">{formatCurrency(item.profitsGenerated)}</p>
+            <p className="text-base font-bold text-emerald-600">
+              {formatCurrency(item.profitsGenerated)}
+            </p>
           </div>
           <div className="rounded-lg bg-gradient-to-br from-purple-500 to-indigo-600 p-3 text-white shadow-md">
             <p className="mb-1 text-xs font-medium text-white/90">Total USD</p>
@@ -84,7 +88,9 @@ export const FinancialDataCard = ({
               viewBox="0 0 24 24"
               xmlns="http://www.w3.org/2000/svg"
               className="mr-1"
+              aria-label="Editar"
             >
+              <title>Editar</title>
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -108,7 +114,9 @@ export const FinancialDataCard = ({
               viewBox="0 0 24 24"
               xmlns="http://www.w3.org/2000/svg"
               className="mr-1"
+              aria-label="Eliminar"
             >
+              <title>Eliminar</title>
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"

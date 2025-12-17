@@ -1,5 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { useDispatch, useSelector, type TypedUseSelectorHook } from 'react-redux';
+import { type TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 import { countryReducer } from '../../modules/country/infrastructure/redux/country.slice';
 import { currencyReducer } from '../../modules/currency/infrastructure/redux/currency.slice';
 import { financialDataReducer } from '../../modules/financial-data/infrastructure/redux/financial-data.slice';

@@ -3,16 +3,20 @@ import { TrackedPage } from '../../../../shared/analytics';
 import { useDashboardEntities } from '../../../../shared/dashboard';
 import { ErrorMessage } from '../../../../shared/ui/components/ErrorMessage';
 import { LoadingSpinner } from '../../../../shared/ui/components/LoadingSpinner';
-import type { CurrencyCode, CreateCurrencyInput, UpdateExchangeRateInput } from '../../domain/types';
 import { DashboardLayout } from '../../../financial-data/presentation/components/DashboardLayout';
+import { getCurrencyByCodeUseCase } from '../../application/use-cases/get-currency-by-code.use-case';
+import type {
+  CreateCurrencyInput,
+  CurrencyCode,
+  UpdateExchangeRateInput,
+} from '../../domain/types';
 import { CurrencyCard } from '../components/CurrencyCard';
 import { CurrencyModal } from '../components/CurrencyModal';
 import { UpdateExchangeRateModal } from '../components/UpdateExchangeRateModal';
 import { useCreateCurrency } from '../hooks/use-create-currency';
+import { useCurrencyRepository } from '../hooks/use-currency-repository';
 import { useGetAllCurrencies } from '../hooks/use-get-all-currencies';
 import { useUpdateExchangeRate } from '../hooks/use-update-exchange-rate';
-import { useCurrencyRepository } from '../hooks/use-currency-repository';
-import { getCurrencyByCodeUseCase } from '../../application/use-cases/get-currency-by-code.use-case';
 
 export const CurrencyListPage = () => {
   const { items, isLoading, error, reload } = useGetAllCurrencies();
@@ -110,7 +114,7 @@ export const CurrencyListPage = () => {
         {/* Empty State */}
         {!isLoading && !errorMessage && items.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-gray-100" aria-label="Icono de monedas vacías">
+            <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-gray-100">
               <svg
                 width="40"
                 height="40"
@@ -119,7 +123,9 @@ export const CurrencyListPage = () => {
                 viewBox="0 0 24 24"
                 xmlns="http://www.w3.org/2000/svg"
                 className="text-gray-400"
+                aria-label="Icono de monedas vacías"
               >
+                <title>Icono de monedas vacías</title>
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"

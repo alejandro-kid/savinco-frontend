@@ -1,5 +1,5 @@
 import type { FormEvent } from 'react';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '../../../../../shared/ui/components/Button';
 import { ErrorMessage } from '../../../../../shared/ui/components/ErrorMessage';
 import { Input } from '../../../../../shared/ui/components/Input';
@@ -34,7 +34,7 @@ export const UpdateExchangeRateForm = ({
     event.preventDefault();
 
     const exchangeRate = parseFloat(exchangeRateToBase);
-    if (isNaN(exchangeRate) || exchangeRate <= 0) {
+    if (Number.isNaN(exchangeRate) || exchangeRate <= 0) {
       return;
     }
 
@@ -45,9 +45,7 @@ export const UpdateExchangeRateForm = ({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {errorMessage ? (
-        <ErrorMessage>{errorMessage}</ErrorMessage>
-      ) : null}
+      {errorMessage ? <ErrorMessage>{errorMessage}</ErrorMessage> : null}
 
       <div>
         <label htmlFor="exchangeRate" className="mb-1 block text-sm font-medium text-gray-700">

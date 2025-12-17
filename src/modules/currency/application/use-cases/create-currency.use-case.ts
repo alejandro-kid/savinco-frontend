@@ -1,4 +1,4 @@
-import type { Currency, CreateCurrencyInput, CurrencyRepository } from '../../domain';
+import type { CreateCurrencyInput, Currency, CurrencyRepository } from '../../domain';
 
 export const createCurrencyUseCase = async (
   currencyRepository: CurrencyRepository,

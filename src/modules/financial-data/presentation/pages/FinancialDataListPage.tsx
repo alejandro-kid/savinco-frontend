@@ -10,8 +10,8 @@ import { FinancialDataModal } from '../components/FinancialDataModal';
 import { useCreateFinancialData } from '../hooks/use-create-financial-data';
 import { useDeleteFinancialData } from '../hooks/use-delete-financial-data';
 import { useGetAllFinancialData } from '../hooks/use-get-all-financial-data';
-import { useUpdateFinancialData } from '../hooks/use-update-financial-data';
 import { useGetByCountry } from '../hooks/use-get-by-country';
+import { useUpdateFinancialData } from '../hooks/use-update-financial-data';
 
 export const FinancialDataListPage = () => {
   const { items, isLoading, error, reload } = useGetAllFinancialData();
@@ -75,7 +75,7 @@ export const FinancialDataListPage = () => {
     );
     if (!confirmed) return;
 
-    await remove(countryCode as never);
+    await remove(countryCode);
     await reload();
   };
 
@@ -128,7 +128,7 @@ export const FinancialDataListPage = () => {
         {/* Empty State */}
         {!isLoading && !errorMessage && items.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-gray-100" aria-label="Icono de datos financieros vacíos">
+            <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-gray-100">
               <svg
                 width="40"
                 height="40"
@@ -137,7 +137,9 @@ export const FinancialDataListPage = () => {
                 viewBox="0 0 24 24"
                 xmlns="http://www.w3.org/2000/svg"
                 className="text-gray-400"
+                aria-label="Icono de datos financieros vacíos"
               >
+                <title>Icono de datos financieros vacíos</title>
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"

@@ -18,7 +18,13 @@ export const FinancialDataEditPage = () => {
 
   // Cargar datos existentes al montar el componente
   useEffect(() => {
-    if (countryCode && (countryCode === 'ECU' || countryCode === 'ESP' || countryCode === 'PER' || countryCode === 'NPL')) {
+    if (
+      countryCode &&
+      (countryCode === 'ECU' ||
+        countryCode === 'ESP' ||
+        countryCode === 'PER' ||
+        countryCode === 'NPL')
+    ) {
       load(countryCode as CountryCode)
         .then((data) => {
           if (data) {
@@ -92,8 +98,8 @@ export const FinancialDataEditPage = () => {
         <header className="mb-6">
           <h1 className="text-2xl font-bold text-gray-900">Editar Datos Financieros</h1>
           <p className="text-sm text-gray-600">
-            Actualiza los datos financieros para {countryCode}. Los valores se almacenan en la moneda
-            original y se mostrarán convertidos a USD.
+            Actualiza los datos financieros para {countryCode}. Los valores se almacenan en la
+            moneda original y se mostrarán convertidos a USD.
           </p>
         </header>
 

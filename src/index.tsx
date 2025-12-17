@@ -10,7 +10,7 @@ import { store } from './shared/redux/store';
 const rootEl = document.getElementById('root');
 if (rootEl) {
   const root = ReactDOM.createRoot(rootEl);
-  
+
   // Only initialize PostHog if properly configured
   const appContent = (
     <Provider store={store}>
