@@ -24,7 +24,9 @@ export const DashboardLayout = ({
   createButtonLabel = 'Agregar',
 }: DashboardLayoutProps) => {
   const location = useLocation();
-  const currentPath = location.pathname.split('/').slice(0, 3).join('/') || '/dashboard';
+  // Detectar la entidad activa basándose en el path completo
+  // Compara con el path base de cada entidad
+  const currentPath = location.pathname;
 
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50">
@@ -62,7 +64,8 @@ export const DashboardLayout = ({
           </div>
           <ul className="space-y-1">
             {entities.map((entity) => {
-              const isActive = currentPath === entity.path;
+              // Una entidad está activa si el path actual comienza con su path base
+              const isActive = currentPath.startsWith(entity.path) || currentPath === entity.path;
               return (
                 <li key={entity.id}>
                   <Link
