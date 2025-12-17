@@ -51,8 +51,15 @@ export const API_CONFIG = {
    * Base URL for the API backend
    * Default: http://localhost:8080/api/v1
    * Can be overridden with PUBLIC_API_BASE_URL environment variable
+   * Note: If PUBLIC_API_BASE_URL doesn't end with /api/v1, it will be appended
    */
-  BASE_URL: getEnv('PUBLIC_API_BASE_URL', 'http://localhost:8080/api/v1'),
+  BASE_URL: (() => {
+    const url = getEnv('PUBLIC_API_BASE_URL', 'http://localhost:8080');
+    // Ensure URL doesn't end with slash
+    const cleanUrl = url.endsWith('/') ? url.slice(0, -1) : url;
+    // Append /api/v1 if not already present
+    return cleanUrl.endsWith('/api/v1') ? cleanUrl : `${cleanUrl}/api/v1`;
+  })(),
 
   /**
    * API timeout in milliseconds
