@@ -1,8 +1,12 @@
 import { store } from '../../../../shared/redux/store';
 import type { CurrencyRepository } from '../../domain/repository.interface';
-import type { Currency, CreateCurrencyInput, UpdateExchangeRateInput } from '../../domain/types';
+import type { CreateCurrencyInput, Currency, UpdateExchangeRateInput } from '../../domain/types';
 import { currencyApiClient } from '../http/currency-api.client';
-import { mapCurrencyFromDTO, mapCurrencyToCreateDTO, mapUpdateExchangeRateToDTO } from '../http/mappers/currency.mapper';
+import {
+  mapCurrencyFromDTO,
+  mapCurrencyToCreateDTO,
+  mapUpdateExchangeRateToDTO,
+} from '../http/mappers/currency.mapper';
 import { currencyActions } from '../redux/currency.slice';
 
 export const currencyRepository: CurrencyRepository = {
@@ -17,7 +21,9 @@ export const currencyRepository: CurrencyRepository = {
       return currency;
     } catch (error) {
       store.dispatch(
-        currencyActions.mutationFailed(error instanceof Error ? error.message : 'Unknown error while creating currency')
+        currencyActions.mutationFailed(
+          error instanceof Error ? error.message : 'Unknown error while creating currency'
+        )
       );
       throw error;
     }
@@ -32,7 +38,9 @@ export const currencyRepository: CurrencyRepository = {
       return items;
     } catch (error) {
       store.dispatch(
-        currencyActions.requestFailed(error instanceof Error ? error.message : 'Unknown error while fetching currencies')
+        currencyActions.requestFailed(
+          error instanceof Error ? error.message : 'Unknown error while fetching currencies'
+        )
       );
       throw error;
     }
@@ -44,7 +52,7 @@ export const currencyRepository: CurrencyRepository = {
       const currency = mapCurrencyFromDTO(response);
       store.dispatch(currencyActions.upsertCurrency(currency));
       return currency;
-    } catch (error) {
+    } catch (_error) {
       return null;
     }
   },

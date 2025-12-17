@@ -1,9 +1,12 @@
 import { useCallback } from 'react';
-import { createCountryUseCase } from '../../application';
-import type { CreateCountryInput, Country } from '../../domain/types';
-import { useCountryRepository } from './use-country-repository';
 import { useAppSelector } from '../../../../shared/redux/store';
-import { selectCountryIsMutating, selectCountryError } from '../../infrastructure/redux/country.selectors';
+import { createCountryUseCase } from '../../application';
+import type { Country, CreateCountryInput } from '../../domain/types';
+import {
+  selectCountryError,
+  selectCountryIsMutating,
+} from '../../infrastructure/redux/country.selectors';
+import { useCountryRepository } from './use-country-repository';
 
 export const useCreateCountry = () => {
   const repository = useCountryRepository();

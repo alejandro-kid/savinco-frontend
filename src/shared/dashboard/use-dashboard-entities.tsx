@@ -1,13 +1,13 @@
 import { useMemo } from 'react';
-import { getAllEntities } from './entities-config';
-import { useGetAllFinancialData } from '../../modules/financial-data/presentation/hooks/use-get-all-financial-data';
-import { useGetAllCurrencies } from '../../modules/currency/presentation/hooks/use-get-all-currencies';
 import { useGetAllCountries } from '../../modules/country/presentation/hooks/use-get-all-countries';
+import { useGetAllCurrencies } from '../../modules/currency/presentation/hooks/use-get-all-currencies';
 import type { DashboardEntity } from '../../modules/financial-data/presentation/components/DashboardLayout';
+import { useGetAllFinancialData } from '../../modules/financial-data/presentation/hooks/use-get-all-financial-data';
+import { getAllEntities } from './entities-config';
 
 /**
  * Hook para obtener todas las entidades del dashboard con badges actualizados
- * 
+ *
  * Este hook se encarga de:
  * - Obtener la configuración de todas las entidades
  * - Actualizar los badges dinámicamente basándose en los datos reales

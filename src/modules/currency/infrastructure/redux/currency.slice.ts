@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import type { Currency, CurrencyCode } from '../../domain/types';
+import type { Currency } from '../../domain/types';
 
 export type CurrencyState = {
   items: Array<Currency>;

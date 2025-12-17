@@ -68,7 +68,9 @@ export const CurrencyCard = ({ item, onEdit, isProcessing = false }: CurrencyCar
                 viewBox="0 0 24 24"
                 xmlns="http://www.w3.org/2000/svg"
                 className="mr-1"
+                aria-label="Editar"
               >
+                <title>Editar</title>
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"

@@ -3,8 +3,8 @@ import { TrackedPage } from '../../../../shared/analytics';
 import { useDashboardEntities } from '../../../../shared/dashboard';
 import { ErrorMessage } from '../../../../shared/ui/components/ErrorMessage';
 import { LoadingSpinner } from '../../../../shared/ui/components/LoadingSpinner';
-import type { CreateCountryInput } from '../../domain/types';
 import { DashboardLayout } from '../../../financial-data/presentation/components/DashboardLayout';
+import type { CreateCountryInput } from '../../domain/types';
 import { CountryCard } from '../components/CountryCard';
 import { CountryModal } from '../components/CountryModal';
 import { useCreateCountry } from '../hooks/use-create-country';
@@ -33,7 +33,6 @@ export const CountryListPage = () => {
     setIsCreateModalOpen(false);
   };
 
-  const isProcessing = isCreating;
   const errorMessage = error || createError;
 
   return (
@@ -72,7 +71,7 @@ export const CountryListPage = () => {
         {/* Empty State */}
         {!isLoading && !errorMessage && items.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-gray-100" aria-label="Icono de países vacíos">
+            <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-gray-100">
               <svg
                 width="40"
                 height="40"
@@ -81,7 +80,9 @@ export const CountryListPage = () => {
                 viewBox="0 0 24 24"
                 xmlns="http://www.w3.org/2000/svg"
                 className="text-gray-400"
+                aria-label="Icono de países vacíos"
               >
+                <title>Icono de países vacíos</title>
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -108,7 +109,7 @@ export const CountryListPage = () => {
         {!isLoading && !errorMessage && items.length > 0 ? (
           <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
             {items.map((item) => (
-              <CountryCard key={item.code} item={item} isProcessing={isProcessing} />
+              <CountryCard key={item.code} item={item} />
             ))}
           </div>
         ) : null}

@@ -1,12 +1,11 @@
-import type { ReactNode } from 'react';
-import { FinancialDataListPage } from '../../modules/financial-data/presentation/pages/FinancialDataListPage';
-import { CurrencyListPage } from '../../modules/currency/presentation/pages/CurrencyListPage';
 import { CountryListPage } from '../../modules/country/presentation/pages/CountryListPage';
+import { CurrencyListPage } from '../../modules/currency/presentation/pages/CurrencyListPage';
+import { FinancialDataListPage } from '../../modules/financial-data/presentation/pages/FinancialDataListPage';
 import type { DashboardEntityConfig } from './types';
 
 /**
  * Configuración centralizada de todas las entidades del dashboard
- * 
+ *
  * Para agregar una nueva entidad:
  * 1. Crea el módulo siguiendo la estructura de financial-data
  * 2. Crea la página de lista (ej: MyEntityListPage)
@@ -26,7 +25,9 @@ export const DASHBOARD_ENTITIES: Array<DashboardEntityConfig> = [
         stroke="currentColor"
         viewBox="0 0 24 24"
         xmlns="http://www.w3.org/2000/svg"
+        aria-label="Datos Financieros"
       >
+        <title>Datos Financieros</title>
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -54,7 +55,9 @@ export const DASHBOARD_ENTITIES: Array<DashboardEntityConfig> = [
         stroke="currentColor"
         viewBox="0 0 24 24"
         xmlns="http://www.w3.org/2000/svg"
+        aria-label="Monedas"
       >
+        <title>Monedas</title>
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -80,7 +83,9 @@ export const DASHBOARD_ENTITIES: Array<DashboardEntityConfig> = [
         stroke="currentColor"
         viewBox="0 0 24 24"
         xmlns="http://www.w3.org/2000/svg"
+        aria-label="Países"
       >
+        <title>Países</title>
         <path
           strokeLinecap="round"
           strokeLinejoin="round"

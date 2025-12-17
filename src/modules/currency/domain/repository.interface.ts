@@ -1,4 +1,4 @@
-import type { Currency, CreateCurrencyInput, UpdateExchangeRateInput } from './types';
+import type { CreateCurrencyInput, Currency, UpdateExchangeRateInput } from './types';
 
 /**
  * Repository interface for currency operations.

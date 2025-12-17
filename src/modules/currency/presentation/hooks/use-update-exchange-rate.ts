@@ -1,9 +1,12 @@
 import { useCallback } from 'react';
+import { useAppSelector } from '../../../../shared/redux/store';
 import { updateExchangeRateUseCase } from '../../application';
 import type { Currency, UpdateExchangeRateInput } from '../../domain/types';
+import {
+  selectCurrencyError,
+  selectCurrencyIsMutating,
+} from '../../infrastructure/redux/currency.selectors';
 import { useCurrencyRepository } from './use-currency-repository';
-import { useAppSelector } from '../../../../shared/redux/store';
-import { selectCurrencyIsMutating, selectCurrencyError } from '../../infrastructure/redux/currency.selectors';
 
 export const useUpdateExchangeRate = () => {
   const repository = useCurrencyRepository();

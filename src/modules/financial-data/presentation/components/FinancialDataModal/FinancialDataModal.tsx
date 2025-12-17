@@ -1,5 +1,3 @@
-import type { ReactNode } from 'react';
-import { Button } from '../../../../../shared/ui/components/Button';
 import { Card } from '../../../../../shared/ui/components/Card';
 import { FinancialDataForm, type FinancialDataFormProps } from '../FinancialDataForm';
 
@@ -28,7 +26,7 @@ export const FinancialDataModal = ({
     try {
       await onSubmit(value);
       // Modal se cierra desde el componente padre después de éxito
-    } catch (error) {
+    } catch (_error) {
       // Error ya está manejado por el componente padre
     }
   };
@@ -40,6 +38,7 @@ export const FinancialDataModal = ({
         <div className="mb-6 flex items-center justify-between border-b border-gray-200 pb-4">
           <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
           <button
+            type="button"
             onClick={onClose}
             className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
             aria-label="Cerrar"
@@ -51,7 +50,9 @@ export const FinancialDataModal = ({
               stroke="currentColor"
               viewBox="0 0 24 24"
               xmlns="http://www.w3.org/2000/svg"
+              aria-label="Cerrar"
             >
+              <title>Cerrar</title>
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"

@@ -1,2 +1,2 @@
-export { FinancialDataModal } from './FinancialDataModal';
 export type { FinancialDataModalProps } from './FinancialDataModal';
+export { FinancialDataModal } from './FinancialDataModal';

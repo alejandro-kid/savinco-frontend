@@ -1,7 +1,10 @@
-import { APP_CONFIG } from '../../../../shared/config/env';
 import { apiClient } from '../../../../shared/http/api-client';
 import type { CurrencyCode } from '../../domain/types';
-import type { CreateCurrencyDTO, CurrencyResponseDTO, UpdateExchangeRateDTO } from './dtos/currency-response.dto';
+import type {
+  CreateCurrencyDTO,
+  CurrencyResponseDTO,
+  UpdateExchangeRateDTO,
+} from './dtos/currency-response.dto';
 
 const BASE_PATH = '/currencies';
 
@@ -29,8 +32,14 @@ const realCurrencyApiClient = {
     return response.data;
   },
 
-  updateExchangeRate: async (code: CurrencyCode, payload: UpdateExchangeRateDTO): Promise<CurrencyResponseDTO> => {
-    const response = await apiClient.put<CurrencyResponseDTO>(`${BASE_PATH}/${code}/exchange-rate`, payload);
+  updateExchangeRate: async (
+    code: CurrencyCode,
+    payload: UpdateExchangeRateDTO
+  ): Promise<CurrencyResponseDTO> => {
+    const response = await apiClient.put<CurrencyResponseDTO>(
+      `${BASE_PATH}/${code}/exchange-rate`,
+      payload
+    );
     return response.data;
   },
 };
