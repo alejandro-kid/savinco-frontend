@@ -20,11 +20,7 @@ export const currencyRepository: CurrencyRepository = {
       store.dispatch(currencyActions.mutationEnded());
       return currency;
     } catch (error) {
-      store.dispatch(
-        currencyActions.mutationFailed(
-          error instanceof Error ? error.message : 'Unknown error while creating currency'
-        )
-      );
+      store.dispatch(currencyActions.mutationFailed('No se pudieron cargar los datos'));
       throw error;
     }
   },
@@ -37,11 +33,7 @@ export const currencyRepository: CurrencyRepository = {
       store.dispatch(currencyActions.requestSucceeded(items));
       return items;
     } catch (error) {
-      store.dispatch(
-        currencyActions.requestFailed(
-          error instanceof Error ? error.message : 'Unknown error while fetching currencies'
-        )
-      );
+      store.dispatch(currencyActions.requestFailed('No se pudieron cargar los datos'));
       throw error;
     }
   },
@@ -64,12 +56,8 @@ export const currencyRepository: CurrencyRepository = {
       const currency = mapCurrencyFromDTO(response);
       store.dispatch(currencyActions.requestBaseSucceeded(currency));
       return currency;
-    } catch (error) {
-      store.dispatch(
-        currencyActions.requestBaseFailed(
-          error instanceof Error ? error.message : 'Unknown error while fetching base currency'
-        )
-      );
+    } catch (_error) {
+      store.dispatch(currencyActions.requestBaseFailed('No se pudieron cargar los datos'));
       return null;
     }
   },
@@ -84,11 +72,7 @@ export const currencyRepository: CurrencyRepository = {
       store.dispatch(currencyActions.mutationEnded());
       return currency;
     } catch (error) {
-      store.dispatch(
-        currencyActions.mutationFailed(
-          error instanceof Error ? error.message : 'Unknown error while updating exchange rate'
-        )
-      );
+      store.dispatch(currencyActions.mutationFailed('No se pudieron cargar los datos'));
       throw error;
     }
   },

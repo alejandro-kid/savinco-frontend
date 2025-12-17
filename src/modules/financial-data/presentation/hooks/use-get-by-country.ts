@@ -18,7 +18,7 @@ export const useGetByCountry = () => {
         return result;
       } catch (err) {
         setIsLoading(false);
-        setError(err instanceof Error ? err.message : 'Unknown error while fetching country data');
+        setError('No se pudieron cargar los datos');
         throw err;
       }
     },
