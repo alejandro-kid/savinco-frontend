@@ -18,11 +18,11 @@ export type Currency = {
 
 /**
  * Input data for creating a currency.
+ * Note: isBase is determined automatically by the backend - if no base currency exists, the first currency becomes the base.
  */
 export type CreateCurrencyInput = {
   code: CurrencyCode;
   name: string;
-  isBase: boolean;
   exchangeRateToBase: number;
 };
 

@@ -1,7 +1,8 @@
 import { Card } from '../../../../../shared/ui/components/Card';
 import { ErrorMessage } from '../../../../../shared/ui/components/ErrorMessage';
 import { LoadingSpinner } from '../../../../../shared/ui/components/LoadingSpinner';
-import { formatCurrency } from '../../../../../shared/utils';
+import { useFormatCurrency } from '../../../../../shared/utils/use-format-currency';
+import { useBaseCurrency } from '../../../../currency/presentation/hooks/use-base-currency';
 import type { FinancialDataSummary } from '../../../domain/types';
 
 export interface FinancialDataSummaryProps {
@@ -15,8 +16,11 @@ export const FinancialDataSummaryComponent = ({
   isLoading,
   error,
 }: FinancialDataSummaryProps) => {
+  const baseCurrency = useBaseCurrency();
+  const formatCurrency = useFormatCurrency();
+
   return (
-    <Card title="Resumen Consolidado (USD)">
+    <Card title={`Resumen Consolidado (${baseCurrency?.code ?? 'Moneda Base'})`}>
       {isLoading ? <LoadingSpinner /> : null}
 
       {error ? (

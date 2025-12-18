@@ -9,4 +9,5 @@ export interface CurrencyRepository {
   getBase: () => Promise<Currency | null>;
   create: (input: CreateCurrencyInput) => Promise<Currency>;
   updateExchangeRate: (code: string, input: UpdateExchangeRateInput) => Promise<Currency>;
+  delete: (code: string) => Promise<void>;
 }

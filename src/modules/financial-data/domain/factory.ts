@@ -1,25 +1,16 @@
-import {
+import type {
   CountryCode,
-  type CountryName,
-  type CurrencyCode,
-  type FinancialData,
-  type FinancialDataByCountrySummary,
-  type FinancialDataInput,
-  type FinancialDataSummary,
+  CurrencyCode,
+  FinancialData,
+  FinancialDataByCountrySummary,
+  FinancialDataInput,
+  FinancialDataSummary,
 } from './types';
 import {
-  ensureCurrencyMatchesCountry,
+  ensureCountryCodeFormat,
+  ensureCurrencyCodeFormat,
   ensureNonNegativeAmounts,
-  ensureValidCountryCode,
-  ensureValidCurrencyCode,
 } from './validations';
-
-const COUNTRY_NAME_MAP: Record<CountryCode, CountryName> = {
-  [CountryCode.ECU]: 'Ecuador',
-  [CountryCode.ESP]: 'España',
-  [CountryCode.PER]: 'Perú',
-  [CountryCode.NPL]: 'Nepal',
-};
 
 export const createFinancialDataFromResponse = (params: {
   countryCode: CountryCode;
@@ -30,13 +21,11 @@ export const createFinancialDataFromResponse = (params: {
   profitsGenerated: number;
   totalInUSD: number;
 }): FinancialData => {
-  const countryCode = ensureValidCountryCode(params.countryCode);
-  const originalCurrency = ensureValidCurrencyCode(params.originalCurrency);
-
+  // Use country name from backend response, not hardcoded map
   return {
-    countryCode,
-    countryName: COUNTRY_NAME_MAP[countryCode],
-    originalCurrency,
+    countryCode: ensureCountryCodeFormat(params.countryCode),
+    countryName: params.countryName,
+    originalCurrency: ensureCurrencyCodeFormat(params.originalCurrency),
     capitalSaved: params.capitalSaved,
     capitalLoaned: params.capitalLoaned,
     profitsGenerated: params.profitsGenerated,
@@ -45,15 +34,13 @@ export const createFinancialDataFromResponse = (params: {
 };
 
 export const createFinancialDataInput = (input: FinancialDataInput): FinancialDataInput => {
-  const countryCode = ensureValidCountryCode(input.countryCode);
-  const currencyCode = ensureValidCurrencyCode(input.currencyCode);
-
-  ensureCurrencyMatchesCountry(countryCode, currencyCode);
+  // Only validate format and non-negative amounts
+  // Backend will validate country/currency validity and matching
   ensureNonNegativeAmounts(input);
 
   return {
-    countryCode,
-    currencyCode,
+    countryCode: ensureCountryCodeFormat(input.countryCode),
+    currencyCode: ensureCurrencyCodeFormat(input.currencyCode),
     capitalSaved: input.capitalSaved,
     capitalLoaned: input.capitalLoaned,
     profitsGenerated: input.profitsGenerated,
@@ -73,16 +60,14 @@ export const createFinancialDataSummary = (params: {
     profitsGenerated: number;
   }>;
 }): FinancialDataSummary => {
-  const byCountry: Array<FinancialDataByCountrySummary> = params.byCountry.map((item) => {
-    const countryCode = ensureValidCountryCode(item.countryCode);
-    return {
-      countryCode,
-      countryName: COUNTRY_NAME_MAP[countryCode],
-      capitalSaved: item.capitalSaved,
-      capitalLoaned: item.capitalLoaned,
-      profitsGenerated: item.profitsGenerated,
-    };
-  });
+  // Use country names from backend response
+  const byCountry: Array<FinancialDataByCountrySummary> = params.byCountry.map((item) => ({
+    countryCode: ensureCountryCodeFormat(item.countryCode),
+    countryName: item.countryName,
+    capitalSaved: item.capitalSaved,
+    capitalLoaned: item.capitalLoaned,
+    profitsGenerated: item.profitsGenerated,
+  }));
 
   return {
     totalCapitalSaved: params.totalCapitalSaved,

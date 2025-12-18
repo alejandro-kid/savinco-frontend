@@ -1,4 +1,5 @@
 export { createCurrencyUseCase } from './use-cases/create-currency.use-case';
+export { deleteCurrencyUseCase } from './use-cases/delete-currency.use-case';
 export { getAllCurrenciesUseCase } from './use-cases/get-all-currencies.use-case';
 export { getBaseCurrencyUseCase } from './use-cases/get-base-currency.use-case';
 export { getCurrencyByCodeUseCase } from './use-cases/get-currency-by-code.use-case';

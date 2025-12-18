@@ -1,7 +1,8 @@
 import { useTrackedButton } from '../../../../../shared/analytics';
 import { Button } from '../../../../../shared/ui/components/Button';
 import { Card } from '../../../../../shared/ui/components/Card';
-import { formatCurrency } from '../../../../../shared/utils';
+import { useFormatCurrency } from '../../../../../shared/utils/use-format-currency';
+import { useBaseCurrency } from '../../../../currency/presentation/hooks/use-base-currency';
 import type { CountryCode, FinancialData } from '../../../domain/types';
 
 export interface FinancialDataCardProps {
@@ -17,6 +18,8 @@ export const FinancialDataCard = ({
   onDelete,
   isProcessing = false,
 }: FinancialDataCardProps) => {
+  const baseCurrency = useBaseCurrency();
+  const formatCurrency = useFormatCurrency();
   const trackedEditButton = useTrackedButton({
     actionName: 'financial_data_edit',
     section: 'financial-data-card',
@@ -35,11 +38,22 @@ export const FinancialDataCard = ({
   });
 
   const getCountryFlag = (countryCode: CountryCode): string => {
-    const flags: Record<CountryCode, string> = {
+    // Mapeo de códigos de país a emojis de banderas
+    // Si no hay mapeo, usar emoji genérico
+    const flags: Record<string, string> = {
       ECU: '🇪🇨',
       ESP: '🇪🇸',
       PER: '🇵🇪',
       NPL: '🇳🇵',
+      // Agregar más países según sea necesario
+      ENG: '🇬🇧',
+      GBR: '🇬🇧',
+      USA: '🇺🇸',
+      MEX: '🇲🇽',
+      COL: '🇨🇴',
+      ARG: '🇦🇷',
+      CHL: '🇨🇱',
+      BRA: '🇧🇷',
     };
     return flags[countryCode] || '🌍';
   };
@@ -85,7 +99,9 @@ export const FinancialDataCard = ({
             </p>
           </div>
           <div className="rounded-lg bg-gradient-to-br from-purple-500 to-indigo-600 p-3 text-white shadow-md">
-            <p className="mb-1 text-xs font-medium text-white/90">Total USD</p>
+            <p className="mb-1 text-xs font-medium text-white/90">
+              Total {baseCurrency?.code ?? 'Moneda Base'}
+            </p>
             <p className="text-base font-bold">{formatCurrency(item.totalInUSD)}</p>
           </div>
         </div>

@@ -1,3 +1,4 @@
+import { parseApiError } from '../../../../shared/http/error-handler';
 import { store } from '../../../../shared/redux/store';
 import type { CurrencyRepository } from '../../domain/repository.interface';
 import type { CreateCurrencyInput, Currency, UpdateExchangeRateInput } from '../../domain/types';
@@ -73,6 +74,23 @@ export const currencyRepository: CurrencyRepository = {
       return currency;
     } catch (error) {
       store.dispatch(currencyActions.mutationFailed('No se pudieron cargar los datos'));
+      throw error;
+    }
+  },
+
+  async delete(code: string): Promise<void> {
+    store.dispatch(currencyActions.mutationStarted());
+    try {
+      await currencyApiClient.delete(code);
+      // Solo eliminamos del estado si la API confirma el éxito
+      store.dispatch(currencyActions.deleteCurrencyOptimistic(code));
+      store.dispatch(currencyActions.mutationEnded());
+    } catch (error) {
+      const apiError = parseApiError(error);
+      const errorMessage =
+        apiError?.message || 'No se pudo eliminar la moneda. Intente nuevamente.';
+      store.dispatch(currencyActions.mutationFailed(errorMessage));
+      // NO recargamos los datos - si dio error, los datos quedan igual
       throw error;
     }
   },

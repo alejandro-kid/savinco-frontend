@@ -1,18 +1,7 @@
-export enum CountryCode {
-  ECU = 'ECU',
-  ESP = 'ESP',
-  PER = 'PER',
-  NPL = 'NPL',
-}
-
-export enum CurrencyCode {
-  USD = 'USD',
-  EUR = 'EUR',
-  PEN = 'PEN',
-  NPR = 'NPR',
-}
-
-export type CountryName = 'Ecuador' | 'España' | 'Perú' | 'Nepal';
+// Country and currency codes are dynamic strings from the backend
+export type CountryCode = string;
+export type CurrencyCode = string;
+export type CountryName = string;
 
 /**
  * Core financial data for a single country.

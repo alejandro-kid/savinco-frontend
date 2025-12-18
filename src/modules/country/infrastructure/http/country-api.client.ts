@@ -22,6 +22,10 @@ const realCountryApiClient = {
     const response = await apiClient.get<CountryResponseDTO>(`${BASE_PATH}/${code}`);
     return response.data;
   },
+
+  delete: async (code: CountryCode): Promise<void> => {
+    await apiClient.delete(`${BASE_PATH}/${code}`);
+  },
 };
 
 /**

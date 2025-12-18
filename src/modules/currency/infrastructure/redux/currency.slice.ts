@@ -7,6 +7,7 @@ export type CurrencyState = {
   isLoading: boolean;
   isMutating: boolean;
   error: string | null;
+  mutationError: string | null;
 };
 
 const initialState: CurrencyState = {
@@ -15,6 +16,7 @@ const initialState: CurrencyState = {
   isLoading: false,
   isMutating: false,
   error: null,
+  mutationError: null,
 };
 
 const currencySlice = createSlice({
@@ -51,14 +53,15 @@ const currencySlice = createSlice({
 
     mutationStarted(state) {
       state.isMutating = true;
-      state.error = null;
+      state.mutationError = null;
     },
     mutationEnded(state) {
       state.isMutating = false;
+      state.mutationError = null;
     },
     mutationFailed(state, action: PayloadAction<string>) {
       state.isMutating = false;
-      state.error = action.payload;
+      state.mutationError = action.payload;
     },
 
     upsertCurrency(state, action: PayloadAction<Currency>) {
@@ -74,8 +77,19 @@ const currencySlice = createSlice({
       }
     },
 
+    deleteCurrencyOptimistic(state, action: PayloadAction<string>) {
+      state.items = state.items.filter((item) => item.code !== action.payload);
+      // Clear base currency if it was deleted
+      if (state.baseCurrency?.code === action.payload) {
+        state.baseCurrency = null;
+      }
+    },
+
     setError(state, action: PayloadAction<string | null>) {
       state.error = action.payload;
+    },
+    setMutationError(state, action: PayloadAction<string | null>) {
+      state.mutationError = action.payload;
     },
   },
 });

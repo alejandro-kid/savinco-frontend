@@ -28,15 +28,18 @@ const financialDataSlice = createSlice({
     requestListStarted(state) {
       state.isLoadingList = true;
       state.error = null;
+      // No limpiar items - mantener los items existentes mientras carga
     },
     requestListSucceeded(state, action: PayloadAction<Array<FinancialData>>) {
       state.isLoadingList = false;
+      // Siempre actualizar items con la respuesta del servidor
       state.items = action.payload;
       state.error = null;
     },
     requestListFailed(state, action: PayloadAction<string>) {
       state.isLoadingList = false;
       state.error = action.payload;
+      // No limpiar items - mantener los items existentes cuando hay error
     },
 
     requestSummaryStarted(state) {

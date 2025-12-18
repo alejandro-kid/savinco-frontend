@@ -21,7 +21,6 @@ export const mapCurrencyToCreateDTO = (input: CreateCurrencyInput): CreateCurren
   return {
     code: input.code,
     name: input.name,
-    isBase: input.isBase,
     exchangeRateToBase: input.exchangeRateToBase,
   };
 };

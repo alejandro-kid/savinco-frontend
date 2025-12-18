@@ -1,10 +1,13 @@
 import type { FormEvent } from 'react';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTrackedForm } from '../../../../../shared/analytics';
+import { useAppSelector } from '../../../../../shared/redux/store';
 import { Button } from '../../../../../shared/ui/components/Button';
 import { ErrorMessage } from '../../../../../shared/ui/components/ErrorMessage';
 import { Input } from '../../../../../shared/ui/components/Input';
-import { CountryCode, CurrencyCode, type FinancialDataInput } from '../../../domain/types';
+import { selectAllCountries } from '../../../../country/infrastructure/redux/country.selectors';
+import { useGetAllCountries } from '../../../../country/presentation/hooks/use-get-all-countries';
+import type { CountryCode, CurrencyCode, FinancialDataInput } from '../../../domain/types';
 import { CountryCodeSelect } from '../CountryCodeSelect';
 import { FinancialDataNumericFields } from '../FinancialDataNumericFields';
 
@@ -15,21 +18,6 @@ export interface FinancialDataFormProps {
   onSubmit: (value: FinancialDataInput) => Promise<void> | void;
   onCancel?: () => void;
 }
-
-const getDefaultCurrencyForCountry = (countryCode: CountryCode | ''): CurrencyCode | '' => {
-  switch (countryCode) {
-    case CountryCode.ECU:
-      return CurrencyCode.USD;
-    case CountryCode.ESP:
-      return CurrencyCode.EUR;
-    case CountryCode.PER:
-      return CurrencyCode.PEN;
-    case CountryCode.NPL:
-      return CurrencyCode.NPR;
-    default:
-      return '';
-  }
-};
 
 export const FinancialDataForm = ({
   initialValue,
@@ -44,6 +32,7 @@ export const FinancialDataForm = ({
     isEdit: !!initialValue,
   });
   const [countryCode, setCountryCode] = useState<CountryCode | ''>(initialValue?.countryCode ?? '');
+  const [currencyCode, setCurrencyCode] = useState<string>(initialValue?.currencyCode ?? '');
   const [capitalSaved, setCapitalSaved] = useState<string>(
     initialValue?.capitalSaved.toString() ?? ''
   );
@@ -54,9 +43,41 @@ export const FinancialDataForm = ({
     initialValue?.profitsGenerated.toString() ?? ''
   );
 
+  // Asegurar que los países estén cargados
+  useGetAllCountries();
+
+  // Obtener todos los países desde Redux
+  const allCountries = useAppSelector(selectAllCountries);
+
+  // Obtener el país seleccionado desde el array de países
+  const selectedCountry = useMemo(() => {
+    if (!countryCode) {
+      return undefined;
+    }
+    return allCountries.find((country) => country.code === countryCode);
+  }, [allCountries, countryCode]);
+
+  // Actualizar currencyCode automáticamente cuando se selecciona un país
+  useEffect(() => {
+    // Si estamos editando, no cambiar la moneda
+    if (initialValue?.currencyCode) {
+      return;
+    }
+    // Si hay un país seleccionado, usar su moneda
+    if (selectedCountry?.currencyCode) {
+      setCurrencyCode(selectedCountry.currencyCode);
+    } else if (!countryCode) {
+      // Si no hay país seleccionado, limpiar la moneda
+      setCurrencyCode('');
+    }
+  }, [selectedCountry, countryCode, initialValue?.currencyCode]);
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!countryCode) return;
+
+    if (!countryCode || !currencyCode) {
+      return;
+    }
 
     // Validar que los valores sean números válidos
     const capitalSavedNum = parseFloat(capitalSaved) || 0;
@@ -70,7 +91,7 @@ export const FinancialDataForm = ({
 
     const value: FinancialDataInput = {
       countryCode,
-      currencyCode: getDefaultCurrencyForCountry(countryCode) as CurrencyCode,
+      currencyCode: currencyCode as CurrencyCode,
       capitalSaved: capitalSavedNum,
       capitalLoaned: capitalLoanedNum,
       profitsGenerated: profitsGeneratedNum,
@@ -110,9 +131,10 @@ export const FinancialDataForm = ({
           </label>
           <Input
             id="currency-code"
-            value={getDefaultCurrencyForCountry(countryCode)}
+            value={currencyCode || ''}
             disabled
             readOnly
+            placeholder={countryCode ? 'Se llenará automáticamente' : 'Selecciona un país primero'}
           />
         </div>
       </div>
@@ -128,7 +150,7 @@ export const FinancialDataForm = ({
       />
 
       <div className="flex gap-2 pt-2">
-        <Button type="submit" disabled={isSubmitting || !countryCode}>
+        <Button type="submit" disabled={isSubmitting || !countryCode || !currencyCode}>
           {isSubmitting ? 'Guardando...' : 'Guardar'}
         </Button>
         {onCancel ? (
