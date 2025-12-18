@@ -7,5 +7,6 @@ export const createFinancialDataUseCase = async (
   input: FinancialDataInput
 ): Promise<FinancialData> => {
   const validatedInput = createFinancialDataInput(input);
-  return repository.create(validatedInput);
+  const result = await repository.create(validatedInput);
+  return result;
 };

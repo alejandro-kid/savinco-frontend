@@ -1,3 +1,4 @@
+import { parseApiError } from '../../../../shared/http/error-handler';
 import { store } from '../../../../shared/redux/store';
 import type { CountryRepository } from '../../domain/repository.interface';
 import type { Country, CreateCountryInput } from '../../domain/types';
@@ -42,6 +43,22 @@ export const countryRepository: CountryRepository = {
       return country;
     } catch (_error) {
       return null;
+    }
+  },
+
+  async delete(code: string): Promise<void> {
+    store.dispatch(countryActions.mutationStarted());
+    try {
+      await countryApiClient.delete(code);
+      // Solo eliminamos del estado si la API confirma el éxito
+      store.dispatch(countryActions.deleteCountryOptimistic(code));
+      store.dispatch(countryActions.mutationEnded());
+    } catch (error) {
+      const apiError = parseApiError(error);
+      const errorMessage = apiError?.message || 'No se pudo eliminar el país. Intente nuevamente.';
+      store.dispatch(countryActions.mutationFailed(errorMessage));
+      // NO recargamos los datos - si dio error, los datos quedan igual
+      throw error;
     }
   },
 };

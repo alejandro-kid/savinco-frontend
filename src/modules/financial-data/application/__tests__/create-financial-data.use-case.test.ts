@@ -1,12 +1,12 @@
 import type { FinancialDataRepository } from '../../domain/repository.interface';
-import { CountryCode, CurrencyCode, type FinancialDataInput } from '../../domain/types';
+import type { FinancialDataInput } from '../../domain/types';
 import { createFinancialDataUseCase } from '../use-cases/create-financial-data.use-case';
 
 describe('createFinancialDataUseCase', () => {
   it('should call repository.create with validated input', async () => {
     const input: FinancialDataInput = {
-      countryCode: CountryCode.ESP,
-      currencyCode: CurrencyCode.EUR,
+      countryCode: 'ESP',
+      currencyCode: 'EUR',
       capitalSaved: 100,
       capitalLoaned: 200,
       profitsGenerated: 50,
@@ -14,9 +14,9 @@ describe('createFinancialDataUseCase', () => {
 
     const repository: jest.Mocked<FinancialDataRepository> = {
       create: jest.fn().mockResolvedValue({
-        countryCode: CountryCode.ESP,
+        countryCode: 'ESP',
         countryName: 'España',
-        originalCurrency: CurrencyCode.EUR,
+        originalCurrency: 'EUR',
         capitalSaved: 111,
         capitalLoaned: 222,
         profitsGenerated: 55,
@@ -32,6 +32,6 @@ describe('createFinancialDataUseCase', () => {
     const result = await createFinancialDataUseCase(repository, input);
 
     expect(repository.create).toHaveBeenCalledWith(input);
-    expect(result.countryCode).toBe(CountryCode.ESP);
+    expect(result.countryCode).toBe('ESP');
   });
 });

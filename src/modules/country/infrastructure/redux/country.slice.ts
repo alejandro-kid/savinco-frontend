@@ -6,6 +6,7 @@ export type CountryState = {
   isLoading: boolean;
   isMutating: boolean;
   error: string | null;
+  mutationError: string | null;
 };
 
 const initialState: CountryState = {
@@ -13,6 +14,7 @@ const initialState: CountryState = {
   isLoading: false,
   isMutating: false,
   error: null,
+  mutationError: null,
 };
 
 const countrySlice = createSlice({
@@ -35,14 +37,15 @@ const countrySlice = createSlice({
 
     mutationStarted(state) {
       state.isMutating = true;
-      state.error = null;
+      state.mutationError = null;
     },
     mutationEnded(state) {
       state.isMutating = false;
+      state.mutationError = null;
     },
     mutationFailed(state, action: PayloadAction<string>) {
       state.isMutating = false;
-      state.error = action.payload;
+      state.mutationError = action.payload;
     },
 
     upsertCountry(state, action: PayloadAction<Country>) {
@@ -54,8 +57,15 @@ const countrySlice = createSlice({
       }
     },
 
+    deleteCountryOptimistic(state, action: PayloadAction<string>) {
+      state.items = state.items.filter((item) => item.code !== action.payload);
+    },
+
     setError(state, action: PayloadAction<string | null>) {
       state.error = action.payload;
+    },
+    setMutationError(state, action: PayloadAction<string | null>) {
+      state.mutationError = action.payload;
     },
   },
 });

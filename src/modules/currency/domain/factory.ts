@@ -10,17 +10,19 @@ export const createCurrency = (currency: Currency): Currency => {
 
 /**
  * Creates a currency from input data (typically from API).
+ * Note: isBase is determined by the backend - the first currency becomes base automatically.
  */
 export const createCurrencyFromInput = (
   input: CreateCurrencyInput,
   id: number,
+  isBase: boolean,
   timestamps: { createdAt: string; updatedAt: string }
 ): Currency => {
   const currency: Currency = {
     id,
     code: input.code,
     name: input.name,
-    isBase: input.isBase,
+    isBase,
     exchangeRateToBase: input.exchangeRateToBase,
     createdAt: timestamps.createdAt,
     updatedAt: timestamps.updatedAt,

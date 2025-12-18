@@ -42,6 +42,10 @@ const realCurrencyApiClient = {
     );
     return response.data;
   },
+
+  delete: async (code: CurrencyCode): Promise<void> => {
+    await apiClient.delete(`${BASE_PATH}/${code}`);
+  },
 };
 
 /**

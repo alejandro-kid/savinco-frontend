@@ -13,7 +13,6 @@ export type CurrencyResponseDTO = {
 export type CreateCurrencyDTO = {
   code: CurrencyCode;
   name: string;
-  isBase: boolean;
   exchangeRateToBase: number;
 };
 

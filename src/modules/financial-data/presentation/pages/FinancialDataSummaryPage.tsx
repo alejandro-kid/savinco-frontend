@@ -1,11 +1,13 @@
 import { useNavigate } from 'react-router-dom';
 import { TrackedPage } from '../../../../shared/analytics';
 import { Button } from '../../../../shared/ui/components/Button';
+import { useBaseCurrency } from '../../../currency/presentation/hooks/use-base-currency';
 import { FinancialDataSummaryComponent } from '../components/FinancialDataSummary';
 import { useGetSummary } from '../hooks/use-get-summary';
 
 export const FinancialDataSummaryPage = () => {
   const navigate = useNavigate();
+  const baseCurrency = useBaseCurrency();
   const { summary, isLoading, error } = useGetSummary();
 
   return (
@@ -15,7 +17,8 @@ export const FinancialDataSummaryPage = () => {
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Resumen Consolidado</h1>
             <p className="text-sm text-gray-600">
-              Visualiza los totales globales y el desglose por país en USD.
+              Visualiza los totales globales y el desglose por país en{' '}
+              {baseCurrency?.code ?? 'moneda base'}.
             </p>
           </div>
           <Button variant="secondary" onClick={() => navigate('/dashboard')}>

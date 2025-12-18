@@ -5,6 +5,7 @@ import { Button } from '../../../../../shared/ui/components/Button';
 import { ErrorMessage } from '../../../../../shared/ui/components/ErrorMessage';
 import { Input } from '../../../../../shared/ui/components/Input';
 import type { CreateCurrencyInput } from '../../../domain/types';
+import { useBaseCurrency } from '../../hooks/use-base-currency';
 
 export interface CurrencyFormProps {
   initialValue?: CreateCurrencyInput;
@@ -26,9 +27,9 @@ export const CurrencyForm = ({
     section: 'currency-form',
     isEdit: !!initialValue,
   });
+  const baseCurrency = useBaseCurrency();
   const [code, setCode] = useState<string>(initialValue?.code ?? '');
   const [name, setName] = useState<string>(initialValue?.name ?? '');
-  const [isBase, setIsBase] = useState<boolean>(initialValue?.isBase ?? false);
   const [exchangeRateToBase, setExchangeRateToBase] = useState<string>(
     initialValue?.exchangeRateToBase.toString() ?? ''
   );
@@ -46,14 +47,9 @@ export const CurrencyForm = ({
       return;
     }
 
-    if (isBase && exchangeRate !== 1.0) {
-      return;
-    }
-
     const value: CreateCurrencyInput = {
       code: currencyCode as never,
       name: name.trim(),
-      isBase,
       exchangeRateToBase: exchangeRate,
     };
 
@@ -63,16 +59,8 @@ export const CurrencyForm = ({
       },
       {
         currencyCode: currencyCode,
-        isBase,
       }
     );
-  };
-
-  const handleIsBaseChange = (checked: boolean) => {
-    setIsBase(checked);
-    if (checked) {
-      setExchangeRateToBase('1.0');
-    }
   };
 
   return (
@@ -119,24 +107,8 @@ export const CurrencyForm = ({
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700">
-          <input
-            type="checkbox"
-            checked={isBase}
-            onChange={(e) => handleIsBaseChange(e.target.checked)}
-            disabled={isSubmitting || !!initialValue}
-            className="mr-2"
-          />
-          Es moneda base (USD)
-        </label>
-        <p className="mt-1 text-xs text-gray-500">
-          Solo una moneda puede ser base. Si está marcado, la tasa de cambio será 1.0
-        </p>
-      </div>
-
-      <div>
         <label htmlFor="exchangeRate" className="mb-1 block text-sm font-medium text-gray-700">
-          Tasa de Cambio a USD
+          Tasa de Cambio a {baseCurrency?.code ?? 'Moneda Base'}
         </label>
         <Input
           id="exchangeRate"
@@ -147,10 +119,17 @@ export const CurrencyForm = ({
           onChange={(e) => setExchangeRateToBase(e.target.value)}
           placeholder="1.1111111111"
           required
-          disabled={isSubmitting || isBase}
+          disabled={isSubmitting}
         />
         <p className="mt-1 text-xs text-gray-500">
-          Cuántos USD equivale 1 unidad de esta moneda. Debe ser mayor a 0.
+          {baseCurrency
+            ? `Cuántas unidades de ${baseCurrency.code} equivale 1 unidad de esta moneda. Debe ser mayor a 0.`
+            : 'Cuántas unidades de la moneda base equivale 1 unidad de esta moneda. Debe ser mayor a 0.'}
+          {!baseCurrency && (
+            <span className="block mt-1">
+              La primera moneda creada se convertirá automáticamente en la moneda base.
+            </span>
+          )}
         </p>
       </div>
 

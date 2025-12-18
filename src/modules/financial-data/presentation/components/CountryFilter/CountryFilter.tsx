@@ -1,6 +1,10 @@
+import { useMemo } from 'react';
 import { useTrackedFilter } from '../../../../../shared/analytics';
+import { useAppSelector } from '../../../../../shared/redux/store';
 import { Select } from '../../../../../shared/ui/components/Select';
-import { CountryCode } from '../../../domain/types';
+import { selectAllCountries } from '../../../../country/infrastructure/redux/country.selectors';
+import { useGetAllCountries } from '../../../../country/presentation/hooks/use-get-all-countries';
+import type { CountryCode } from '../../../domain/types';
 
 export type FilterOption = 'ALL' | CountryCode;
 
@@ -10,19 +14,29 @@ export interface CountryFilterProps {
   disabled?: boolean;
 }
 
-const COUNTRY_OPTIONS: Array<{ value: FilterOption; label: string }> = [
-  { value: 'ALL', label: 'Todos los Países' },
-  { value: CountryCode.ECU, label: 'Ecuador' },
-  { value: CountryCode.ESP, label: 'España' },
-  { value: CountryCode.PER, label: 'Perú' },
-  { value: CountryCode.NPL, label: 'Nepal' },
-];
-
 export const CountryFilter = ({ value, onChange, disabled }: CountryFilterProps) => {
   const trackedFilter = useTrackedFilter({
     filterName: 'country_filter',
     section: 'home-page',
   });
+
+  // Cargar países desde Redux
+  useGetAllCountries();
+  const countries = useAppSelector(selectAllCountries);
+
+  // Crear opciones dinámicamente desde los países en la base de datos
+  const countryOptions = useMemo(() => {
+    const options: Array<{ value: FilterOption; label: string }> = [
+      { value: 'ALL', label: 'Todos los Países' },
+    ];
+    countries.forEach((country) => {
+      options.push({
+        value: country.code,
+        label: country.name,
+      });
+    });
+    return options;
+  }, [countries]);
 
   return (
     <div className="flex items-center gap-3">
@@ -39,7 +53,7 @@ export const CountryFilter = ({ value, onChange, disabled }: CountryFilterProps)
         disabled={disabled}
         className="min-w-[180px]"
       >
-        {COUNTRY_OPTIONS.map((option) => (
+        {countryOptions.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}
           </option>

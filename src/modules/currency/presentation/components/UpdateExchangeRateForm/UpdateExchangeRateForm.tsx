@@ -5,6 +5,7 @@ import { Button } from '../../../../../shared/ui/components/Button';
 import { ErrorMessage } from '../../../../../shared/ui/components/ErrorMessage';
 import { Input } from '../../../../../shared/ui/components/Input';
 import type { UpdateExchangeRateInput } from '../../../domain/types';
+import { useBaseCurrency } from '../../hooks/use-base-currency';
 
 export interface UpdateExchangeRateFormProps {
   initialValue?: number;
@@ -21,6 +22,7 @@ export const UpdateExchangeRateForm = ({
   onSubmit,
   onCancel,
 }: UpdateExchangeRateFormProps) => {
+  const baseCurrency = useBaseCurrency();
   const trackedForm = useTrackedForm({
     formName: 'currency_exchange_rate_form',
     section: 'update-exchange-rate-form',
@@ -64,7 +66,7 @@ export const UpdateExchangeRateForm = ({
 
       <div>
         <label htmlFor="exchangeRate" className="mb-1 block text-sm font-medium text-gray-700">
-          Nueva Tasa de Cambio a USD
+          Nueva Tasa de Cambio a {baseCurrency?.code ?? 'Moneda Base'}
         </label>
         <Input
           id="exchangeRate"
@@ -78,7 +80,9 @@ export const UpdateExchangeRateForm = ({
           disabled={isSubmitting}
         />
         <p className="mt-1 text-xs text-gray-500">
-          Cuántos USD equivale 1 unidad de esta moneda. Debe ser mayor a 0.
+          {baseCurrency
+            ? `Cuántas unidades de ${baseCurrency.code} equivale 1 unidad de esta moneda. Debe ser mayor a 0.`
+            : 'Cuántas unidades de la moneda base equivale 1 unidad de esta moneda. Debe ser mayor a 0.'}
         </p>
       </div>
 

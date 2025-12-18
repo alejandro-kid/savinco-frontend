@@ -1,7 +1,11 @@
 import { useState } from 'react';
 import { TrackedPage, useTrackedOperation } from '../../../../shared/analytics';
 import { useDashboardEntities } from '../../../../shared/dashboard';
+import { parseApiError } from '../../../../shared/http/error-handler';
+import { useAppDispatch } from '../../../../shared/redux/store';
+import { ConfirmModal } from '../../../../shared/ui/components/ConfirmModal';
 import { ErrorMessage } from '../../../../shared/ui/components/ErrorMessage';
+import { ErrorModal } from '../../../../shared/ui/components/ErrorModal/ErrorModal';
 import { LoadingSpinner } from '../../../../shared/ui/components/LoadingSpinner';
 import { DashboardLayout } from '../../../financial-data/presentation/components/DashboardLayout';
 import { getCurrencyByCodeUseCase } from '../../application/use-cases/get-currency-by-code.use-case';
@@ -10,15 +14,18 @@ import type {
   CurrencyCode,
   UpdateExchangeRateInput,
 } from '../../domain/types';
+import { currencyActions } from '../../infrastructure/redux/currency.slice';
 import { CurrencyCard } from '../components/CurrencyCard';
 import { CurrencyModal } from '../components/CurrencyModal';
 import { UpdateExchangeRateModal } from '../components/UpdateExchangeRateModal';
 import { useCreateCurrency } from '../hooks/use-create-currency';
 import { useCurrencyRepository } from '../hooks/use-currency-repository';
+import { useDeleteCurrency } from '../hooks/use-delete-currency';
 import { useGetAllCurrencies } from '../hooks/use-get-all-currencies';
 import { useUpdateExchangeRate } from '../hooks/use-update-exchange-rate';
 
 export const CurrencyListPage = () => {
+  const dispatch = useAppDispatch();
   const trackedOperation = useTrackedOperation({
     entityName: 'currency',
     section: 'currency-list',
@@ -26,14 +33,19 @@ export const CurrencyListPage = () => {
   const { items, isLoading, error, reload } = useGetAllCurrencies();
   const { create, isMutating: isCreating, error: createError } = useCreateCurrency();
   const { update, isMutating: isUpdating, error: updateError } = useUpdateExchangeRate();
+  const { remove, isMutating: isDeleting } = useDeleteCurrency();
   const repository = useCurrencyRepository();
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+  const [errorModalMessage, setErrorModalMessage] = useState<string>('');
   const [editingCode, setEditingCode] = useState<CurrencyCode | null>(null);
   const [editingExchangeRate, setEditingExchangeRate] = useState<number | null>(null);
+  const [deletingCurrencyCode, setDeletingCurrencyCode] = useState<CurrencyCode | null>(null);
 
-  // Obtener entidades del dashboard desde la configuración centralizada
+  // Obtener entidades del dashboard desde la configuraci?n centralizada
   const entities = useDashboardEntities();
 
   const handleCreateClick = () => {
@@ -47,16 +59,16 @@ export const CurrencyListPage = () => {
         'create',
         async () => {
           await create(value);
-          await reload();
+          // No necesitamos reload() porque upsertCurrency ya actualiz? el estado en Redux
+          // Solo se agrega el nuevo elemento, igual que el update y delete optimista
           setIsCreateModalOpen(false);
         },
         {
           currencyCode: value.code,
-          isBase: value.isBase,
         }
       );
     } catch {
-      // Error ya está manejado
+      // Error ya est? manejado
     }
   };
 
@@ -82,7 +94,8 @@ export const CurrencyListPage = () => {
         'update',
         async () => {
           await update(editingCode, value);
-          await reload();
+          // No necesitamos reload() porque upsertCurrency ya actualiz? el estado en Redux
+          // Solo se actualiza la card del elemento modificado, igual que el delete optimista
           setIsEditModalOpen(false);
           setEditingCode(null);
           setEditingExchangeRate(null);
@@ -93,21 +106,67 @@ export const CurrencyListPage = () => {
         }
       );
     } catch {
-      // Error ya está manejado
+      // Error ya est? manejado
     }
   };
 
+  const handleDeleteClick = (code: CurrencyCode) => {
+    trackedOperation.trackModalOpened('delete', { currencyCode: code });
+    setDeletingCurrencyCode(code);
+    setIsDeleteConfirmOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deletingCurrencyCode) return;
+
+    const currencyCodeToDelete = deletingCurrencyCode;
+    trackedOperation.trackConfirmed('delete', { currencyCode: currencyCodeToDelete });
+
+    // Cerrar modal de confirmaci?n
+    setIsDeleteConfirmOpen(false);
+    setDeletingCurrencyCode(null);
+
+    // Ejecutar eliminaci?n
+    try {
+      await trackedOperation.execute(
+        'delete',
+        async () => {
+          await remove(currencyCodeToDelete);
+          // Si la eliminaci?n es exitosa, el repositorio actualiza Redux
+        },
+        { currencyCode: currencyCodeToDelete }
+      );
+    } catch (error) {
+      // Capturar error y mostrarlo en un modal
+      const apiError = parseApiError(error);
+      const errorMessage =
+        apiError?.message || 'No se pudo eliminar la moneda. Intente nuevamente.';
+      setErrorModalMessage(errorMessage);
+      setIsErrorModalOpen(true);
+      // NO cambiamos nada en el dashboard - los datos quedan igual
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    dispatch(currencyActions.setMutationError(null));
+    setIsDeleteConfirmOpen(false);
+    setDeletingCurrencyCode(null);
+  };
+
   const handleCloseCreateModal = () => {
+    dispatch(currencyActions.setMutationError(null));
     setIsCreateModalOpen(false);
   };
 
   const handleCloseEditModal = () => {
+    dispatch(currencyActions.setMutationError(null));
     setIsEditModalOpen(false);
     setEditingCode(null);
     setEditingExchangeRate(null);
   };
 
-  const isProcessing = isCreating || isUpdating;
+  const isProcessing = isCreating || isUpdating || isDeleting;
+  // Solo mostrar errores de carga en el dashboard (no errores de eliminación)
   const errorMessage = error || createError || updateError;
 
   return (
@@ -155,9 +214,9 @@ export const CurrencyListPage = () => {
                 viewBox="0 0 24 24"
                 xmlns="http://www.w3.org/2000/svg"
                 className="text-gray-400"
-                aria-label="Icono de monedas vacías"
+                aria-label="Icono de monedas vac?as"
               >
-                <title>Icono de monedas vacías</title>
+                <title>Icono de monedas vac?as</title>
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -188,7 +247,9 @@ export const CurrencyListPage = () => {
                 key={item.code}
                 item={item}
                 onEdit={handleEditClick}
+                onDelete={handleDeleteClick}
                 isProcessing={isProcessing}
+                totalCurrencies={items.length}
               />
             ))}
           </div>
@@ -213,6 +274,31 @@ export const CurrencyListPage = () => {
           onSubmit={handleEditSubmit}
           isSubmitting={isUpdating}
           errorMessage={updateError}
+        />
+
+        {/* Delete Confirmation Modal */}
+        <ConfirmModal
+          isOpen={isDeleteConfirmOpen}
+          onClose={handleDeleteCancel}
+          onConfirm={handleDeleteConfirm}
+          title="Eliminar Moneda"
+          message="¿Estás seguro de que quieres eliminar esta moneda? Esta acción no se puede deshacer."
+          confirmLabel="Eliminar"
+          cancelLabel="Cancelar"
+          confirmVariant="danger"
+          isLoading={isDeleting}
+        />
+
+        {/* Error Modal */}
+        <ErrorModal
+          isOpen={isErrorModalOpen}
+          onClose={() => {
+            setIsErrorModalOpen(false);
+            setErrorModalMessage('');
+            dispatch(currencyActions.setMutationError(null));
+          }}
+          title="Error al Eliminar Moneda"
+          message={errorModalMessage}
         />
       </DashboardLayout>
     </TrackedPage>
