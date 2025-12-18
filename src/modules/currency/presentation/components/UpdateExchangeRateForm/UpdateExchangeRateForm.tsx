@@ -79,8 +79,8 @@ export const UpdateExchangeRateForm = ({
         />
         <p className="mt-1 text-xs text-gray-500">
           {baseCurrency
-            ? `Cuántas unidades de ${baseCurrency.code} equivale 1 unidad de esta moneda. Debe ser mayor a 0.`
-            : 'Cuántas unidades de la moneda base equivale 1 unidad de esta moneda. Debe ser mayor a 0.'}
+            ? `1 ${baseCurrency.code} = X unidades de esta moneda. Debe ser mayor a 0.`
+            : '1 moneda base = X unidades de esta moneda. Debe ser mayor a 0.'}
         </p>
       </div>
 
