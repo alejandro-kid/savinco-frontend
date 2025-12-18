@@ -43,8 +43,12 @@ export const CurrencyForm = ({
       return;
     }
 
-    const exchangeRate = parseFloat(exchangeRateToBase);
-    if (Number.isNaN(exchangeRate) || exchangeRate <= 0) {
+    // Si es la primera moneda (no hay baseCurrency), usar 1.00 como tasa por defecto
+    // El backend ignora este valor y lo establece automáticamente en 1.00
+    const isFirstCurrency = !baseCurrency;
+    const exchangeRate = isFirstCurrency ? 1.0 : parseFloat(exchangeRateToBase);
+
+    if (!isFirstCurrency && (Number.isNaN(exchangeRate) || exchangeRate <= 0)) {
       return;
     }
 
@@ -107,30 +111,33 @@ export const CurrencyForm = ({
         />
       </div>
 
-      <div>
-        <NumericInput
-          id="exchangeRate"
-          label={`Tasa de Cambio a ${baseCurrency?.code ?? 'Moneda Base'}`}
-          value={exchangeRateToBase}
-          onChange={setExchangeRateToBase}
-          placeholder="1.1111111111"
-          required
-          disabled={isSubmitting}
-          step="0.0000000001"
-          min={0.0000000001}
-          title="Ingrese solo números y un punto decimal (ej: 1.1111111111)"
-        />
-        <p className="mt-1 text-xs text-gray-500">
-          {baseCurrency
-            ? `Cuántas unidades de ${baseCurrency.code} equivale 1 unidad de esta moneda. Debe ser mayor a 0.`
-            : 'Cuántas unidades de la moneda base equivale 1 unidad de esta moneda. Debe ser mayor a 0.'}
-          {!baseCurrency && (
-            <span className="block mt-1">
-              La primera moneda creada se convertirá automáticamente en la moneda base.
-            </span>
-          )}
-        </p>
-      </div>
+      {/* Solo mostrar campo de tasa de cambio si ya existe una moneda base */}
+      {baseCurrency ? (
+        <div>
+          <NumericInput
+            id="exchangeRate"
+            label={`Tasa de Cambio a ${baseCurrency.code}`}
+            value={exchangeRateToBase}
+            onChange={setExchangeRateToBase}
+            placeholder="1.1111111111"
+            required
+            disabled={isSubmitting}
+            step="0.0000000001"
+            min={0.0000000001}
+            title="Ingrese solo números y un punto decimal (ej: 1.1111111111)"
+          />
+          <p className="mt-1 text-xs text-gray-500">
+            1 {baseCurrency.code} = X unidades de esta moneda. Debe ser mayor a 0.
+          </p>
+        </div>
+      ) : (
+        <div className="rounded-lg bg-blue-50 p-4">
+          <p className="text-sm text-blue-800">
+            <strong>Primera moneda:</strong> Esta moneda se convertirá automáticamente en la moneda
+            base con tasa de cambio 1.00.
+          </p>
+        </div>
+      )}
 
       <div className="flex gap-3 pt-4">
         <Button type="submit" disabled={isSubmitting} className="flex-1">
