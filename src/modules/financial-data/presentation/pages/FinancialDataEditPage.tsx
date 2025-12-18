@@ -18,15 +18,16 @@ export const FinancialDataEditPage = () => {
 
   // Cargar datos existentes al montar el componente
   useEffect(() => {
-    if (
-      countryCode &&
-      (countryCode === 'ECU' ||
-        countryCode === 'ESP' ||
-        countryCode === 'PER' ||
-        countryCode === 'NPL')
-    ) {
-      load(countryCode as CountryCode)
-        .then((data) => {
+    const loadData = async () => {
+      if (
+        countryCode &&
+        (countryCode === 'ECU' ||
+          countryCode === 'ESP' ||
+          countryCode === 'PER' ||
+          countryCode === 'NPL')
+      ) {
+        try {
+          const data = await load(countryCode as CountryCode);
           if (data) {
             setExistingData({
               countryCode: data.countryCode,
@@ -36,11 +37,13 @@ export const FinancialDataEditPage = () => {
               profitsGenerated: data.profitsGenerated,
             });
           }
-        })
-        .catch(() => {
+        } catch {
           // Error ya está manejado por el hook
-        });
-    }
+        }
+      }
+    };
+
+    loadData();
   }, [countryCode, load]);
 
   const handleSubmit = async (value: FinancialDataInput) => {

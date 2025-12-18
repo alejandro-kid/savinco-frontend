@@ -1,5 +1,6 @@
 import type { FormEvent } from 'react';
 import { useState } from 'react';
+import { useTrackedForm } from '../../../../../shared/analytics';
 import { Button } from '../../../../../shared/ui/components/Button';
 import { ErrorMessage } from '../../../../../shared/ui/components/ErrorMessage';
 import { Input } from '../../../../../shared/ui/components/Input';
@@ -37,6 +38,11 @@ export const FinancialDataForm = ({
   onSubmit,
   onCancel,
 }: FinancialDataFormProps) => {
+  const trackedForm = useTrackedForm({
+    formName: 'financial_data_form',
+    section: 'financial-data-form',
+    isEdit: !!initialValue,
+  });
   const [countryCode, setCountryCode] = useState<CountryCode | ''>(initialValue?.countryCode ?? '');
   const [capitalSaved, setCapitalSaved] = useState<string>(
     initialValue?.capitalSaved.toString() ?? ''
@@ -70,7 +76,15 @@ export const FinancialDataForm = ({
       profitsGenerated: profitsGeneratedNum,
     };
 
-    await onSubmit(value);
+    await trackedForm.onSubmit(
+      async () => {
+        await onSubmit(value);
+      },
+      {
+        countryCode,
+        currencyCode: value.currencyCode,
+      }
+    );
   };
 
   return (
@@ -118,7 +132,14 @@ export const FinancialDataForm = ({
           {isSubmitting ? 'Guardando...' : 'Guardar'}
         </Button>
         {onCancel ? (
-          <Button type="button" variant="secondary" onClick={onCancel}>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => {
+              trackedForm.onCancel({ countryCode: countryCode || undefined });
+              onCancel();
+            }}
+          >
             Cancelar
           </Button>
         ) : null}

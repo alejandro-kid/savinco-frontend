@@ -1,3 +1,4 @@
+import { useTrackedFilter } from '../../../../../shared/analytics';
 import { Select } from '../../../../../shared/ui/components/Select';
 import { CountryCode } from '../../../domain/types';
 
@@ -18,6 +19,11 @@ const COUNTRY_OPTIONS: Array<{ value: FilterOption; label: string }> = [
 ];
 
 export const CountryFilter = ({ value, onChange, disabled }: CountryFilterProps) => {
+  const trackedFilter = useTrackedFilter({
+    filterName: 'country_filter',
+    section: 'home-page',
+  });
+
   return (
     <div className="flex items-center gap-3">
       <label htmlFor="country-filter" className="text-sm font-medium text-gray-700">
@@ -26,7 +32,10 @@ export const CountryFilter = ({ value, onChange, disabled }: CountryFilterProps)
       <Select
         id="country-filter"
         value={value}
-        onChange={(e) => onChange(e.target.value as FilterOption)}
+        onChange={(e) => {
+          const newValue = e.target.value as FilterOption;
+          trackedFilter.onChange(newValue, value, onChange);
+        }}
         disabled={disabled}
         className="min-w-[180px]"
       >

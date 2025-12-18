@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { TrackedPage } from '../../../../shared/analytics';
+import { TrackedPage, useTrackedOperation } from '../../../../shared/analytics';
 import { useDashboardEntities } from '../../../../shared/dashboard';
 import { ErrorMessage } from '../../../../shared/ui/components/ErrorMessage';
 import { LoadingSpinner } from '../../../../shared/ui/components/LoadingSpinner';
@@ -19,6 +19,10 @@ import { useGetAllCurrencies } from '../hooks/use-get-all-currencies';
 import { useUpdateExchangeRate } from '../hooks/use-update-exchange-rate';
 
 export const CurrencyListPage = () => {
+  const trackedOperation = useTrackedOperation({
+    entityName: 'currency',
+    section: 'currency-list',
+  });
   const { items, isLoading, error, reload } = useGetAllCurrencies();
   const { create, isMutating: isCreating, error: createError } = useCreateCurrency();
   const { update, isMutating: isUpdating, error: updateError } = useUpdateExchangeRate();
@@ -33,16 +37,31 @@ export const CurrencyListPage = () => {
   const entities = useDashboardEntities();
 
   const handleCreateClick = () => {
+    trackedOperation.trackClick('create');
     setIsCreateModalOpen(true);
   };
 
   const handleCreateSubmit = async (value: CreateCurrencyInput) => {
-    await create(value);
-    await reload();
-    setIsCreateModalOpen(false);
+    try {
+      await trackedOperation.execute(
+        'create',
+        async () => {
+          await create(value);
+          await reload();
+          setIsCreateModalOpen(false);
+        },
+        {
+          currencyCode: value.code,
+          isBase: value.isBase,
+        }
+      );
+    } catch {
+      // Error ya está manejado
+    }
   };
 
   const handleEditClick = async (code: CurrencyCode) => {
+    trackedOperation.trackModalOpened('edit', { currencyCode: code });
     setEditingCode(code);
     setIsEditModalOpen(true);
 
@@ -58,11 +77,24 @@ export const CurrencyListPage = () => {
 
   const handleEditSubmit = async (value: UpdateExchangeRateInput) => {
     if (!editingCode) return;
-    await update(editingCode, value);
-    await reload();
-    setIsEditModalOpen(false);
-    setEditingCode(null);
-    setEditingExchangeRate(null);
+    try {
+      await trackedOperation.execute(
+        'update',
+        async () => {
+          await update(editingCode, value);
+          await reload();
+          setIsEditModalOpen(false);
+          setEditingCode(null);
+          setEditingExchangeRate(null);
+        },
+        {
+          currencyCode: editingCode,
+          exchangeRate: value.exchangeRateToBase,
+        }
+      );
+    } catch {
+      // Error ya está manejado
+    }
   };
 
   const handleCloseCreateModal = () => {

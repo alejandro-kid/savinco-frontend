@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { TrackedPage } from '../../../../shared/analytics';
+import { TrackedPage, useTrackedButton } from '../../../../shared/analytics';
 import { Button } from '../../../../shared/ui/components/Button';
 import { ErrorMessage } from '../../../../shared/ui/components/ErrorMessage';
 import { LoadingSpinner } from '../../../../shared/ui/components/LoadingSpinner';
@@ -13,6 +13,10 @@ import { useGetSummary } from '../hooks/use-get-summary';
 
 export const HomePage = () => {
   const navigate = useNavigate();
+  const trackedNavigateButton = useTrackedButton({
+    actionName: 'home_navigate_to_dashboard',
+    section: 'home-page',
+  });
   const { summary, isLoading, error } = useGetSummary();
   const [filter, setFilter] = useState<FilterOption>('ALL');
 
@@ -77,7 +81,9 @@ export const HomePage = () => {
           <div className="mb-6 flex flex-col items-stretch gap-4 sm:mb-8 sm:flex-row sm:items-center sm:justify-between">
             <CountryFilter value={filter} onChange={setFilter} disabled={isLoading} />
             <Button
-              onClick={() => navigate('/dashboard')}
+              onClick={trackedNavigateButton.onClick(() => navigate('/dashboard'), {
+                currentFilter: filter,
+              })}
               variant="primary"
               className="w-full sm:w-auto sm:flex-shrink-0"
             >
