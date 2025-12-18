@@ -1,11 +1,15 @@
 import { useState } from 'react';
 import { TrackedPage } from '../../../../shared/analytics';
 import { useDashboardEntities } from '../../../../shared/dashboard';
+import { useAppDispatch } from '../../../../shared/redux/store';
+import { ConfirmModal } from '../../../../shared/ui/components/ConfirmModal';
 import { ErrorMessage } from '../../../../shared/ui/components/ErrorMessage';
 import { LoadingSpinner } from '../../../../shared/ui/components/LoadingSpinner';
-import type { CountryCode, FinancialDataInput } from '../../domain/types';
+import type { CountryCode, CountryName, FinancialDataInput } from '../../domain/types';
+import { financialDataActions } from '../../infrastructure/redux/financial-data.slice';
 import { DashboardLayout } from '../components/DashboardLayout';
 import { FinancialDataCard } from '../components/FinancialDataCard';
+import { FinancialDataEditModal } from '../components/FinancialDataEditModal';
 import { FinancialDataModal } from '../components/FinancialDataModal';
 import { useCreateFinancialData } from '../hooks/use-create-financial-data';
 import { useDeleteFinancialData } from '../hooks/use-delete-financial-data';
@@ -14,28 +18,38 @@ import { useGetByCountry } from '../hooks/use-get-by-country';
 import { useUpdateFinancialData } from '../hooks/use-update-financial-data';
 
 export const FinancialDataListPage = () => {
+  const dispatch = useAppDispatch();
   const { items, isLoading, error, reload } = useGetAllFinancialData();
   const { create, isMutating: isCreating, error: createError } = useCreateFinancialData();
   const { update, isMutating: isUpdating, error: updateError } = useUpdateFinancialData();
-  const { remove, isMutating: isDeleting } = useDeleteFinancialData();
+  const { remove, isMutating: isDeleting, error: deleteError } = useDeleteFinancialData();
   const { load: loadForEdit, isLoading: isLoadingEdit } = useGetByCountry();
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [deletingCountryCode, setDeletingCountryCode] = useState<CountryCode | null>(null);
   const [editingCountryCode, setEditingCountryCode] = useState<CountryCode | null>(null);
+  const [editingCountryName, setEditingCountryName] = useState<CountryName | null>(null);
   const [editingData, setEditingData] = useState<FinancialDataInput | null>(null);
 
   // Obtener entidades del dashboard desde la configuración centralizada
   const entities = useDashboardEntities();
 
   const handleCreateClick = () => {
+    dispatch(financialDataActions.clearMutationError());
     setIsCreateModalOpen(true);
   };
 
   const handleCreateSubmit = async (value: FinancialDataInput) => {
-    await create(value);
-    await reload();
-    setIsCreateModalOpen(false);
+    try {
+      await create(value);
+      await reload();
+      setIsCreateModalOpen(false);
+    } catch {
+      // Error ya está manejado por el hook y se muestra en el modal
+      // No cerramos el modal para que el usuario pueda ver el error
+    }
   };
 
   const handleEditClick = async (countryCode: CountryCode) => {
@@ -45,6 +59,7 @@ export const FinancialDataListPage = () => {
     try {
       const data = await loadForEdit(countryCode);
       if (data) {
+        setEditingCountryName(data.countryName);
         setEditingData({
           countryCode: data.countryCode,
           currencyCode: data.originalCurrency,
@@ -61,36 +76,65 @@ export const FinancialDataListPage = () => {
 
   const handleEditSubmit = async (value: FinancialDataInput) => {
     if (!editingCountryCode) return;
-    await update(editingCountryCode, value);
-    await reload();
-    setIsEditModalOpen(false);
-    setEditingCountryCode(null);
-    setEditingData(null);
+    try {
+      await update(editingCountryCode, value);
+      await reload();
+      setIsEditModalOpen(false);
+      setEditingCountryCode(null);
+      setEditingCountryName(null);
+      setEditingData(null);
+    } catch {
+      // Error ya está manejado por el hook y se muestra en el modal
+      // No cerramos el modal para que el usuario pueda ver el error
+    }
   };
 
-  const handleDeleteClick = async (countryCode: CountryCode) => {
-    // eslint-disable-next-line no-alert
-    const confirmed = window.confirm(
-      '¿Estás seguro de que quieres eliminar los datos financieros de este país?'
-    );
-    if (!confirmed) return;
+  const handleDeleteClick = (countryCode: CountryCode) => {
+    setDeletingCountryCode(countryCode);
+    setIsDeleteConfirmOpen(true);
+  };
 
-    await remove(countryCode);
-    await reload();
+  const handleDeleteConfirm = async () => {
+    if (!deletingCountryCode) return;
+
+    // Cerrar modal inmediatamente para mejor UX (delete optimista ya actualiza el UI)
+    setIsDeleteConfirmOpen(false);
+    const countryCodeToDelete = deletingCountryCode;
+    setDeletingCountryCode(null);
+
+    // Ejecutar eliminación en background
+    try {
+      await remove(countryCodeToDelete);
+      // No necesitamos reload() porque el delete optimista ya actualizó el estado
+      // Si hay error, se manejará y se mostrará en el estado de error
+    } catch {
+      // Error ya está manejado por el hook y se muestra en el estado
+      // El delete optimista ya se hizo, pero si falla la API, el item volverá al recargar
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    dispatch(financialDataActions.clearMutationError());
+    setIsDeleteConfirmOpen(false);
+    setDeletingCountryCode(null);
   };
 
   const handleCloseCreateModal = () => {
+    dispatch(financialDataActions.clearMutationError());
     setIsCreateModalOpen(false);
   };
 
   const handleCloseEditModal = () => {
+    dispatch(financialDataActions.clearMutationError());
     setIsEditModalOpen(false);
     setEditingCountryCode(null);
+    setEditingCountryName(null);
     setEditingData(null);
   };
 
   const isProcessing = isCreating || isUpdating || isDeleting || isLoadingEdit;
-  const errorMessage = error || createError || updateError;
+  // Mostrar errores de carga y errores de eliminación en el dashboard
+  const errorMessage = error || deleteError;
 
   return (
     <TrackedPage pageName="Dashboard" properties={{ section: 'financial-data-list' }}>
@@ -188,14 +232,34 @@ export const FinancialDataListPage = () => {
         />
 
         {/* Edit Modal */}
-        <FinancialDataModal
-          isOpen={isEditModalOpen}
-          onClose={handleCloseEditModal}
-          title="Editar Datos Financieros"
-          initialValue={editingData ?? undefined}
-          onSubmit={handleEditSubmit}
-          isSubmitting={isUpdating || isLoadingEdit}
-          errorMessage={updateError}
+        {editingData && editingCountryCode && editingCountryName ? (
+          <FinancialDataEditModal
+            isOpen={isEditModalOpen}
+            onClose={handleCloseEditModal}
+            title="Editar Datos Financieros"
+            countryCode={editingCountryCode}
+            countryName={editingCountryName}
+            currencyCode={editingData.currencyCode}
+            initialCapitalSaved={editingData.capitalSaved}
+            initialCapitalLoaned={editingData.capitalLoaned}
+            initialProfitsGenerated={editingData.profitsGenerated}
+            onSubmit={handleEditSubmit}
+            isSubmitting={isUpdating || isLoadingEdit}
+            errorMessage={updateError}
+          />
+        ) : null}
+
+        {/* Delete Confirmation Modal */}
+        <ConfirmModal
+          isOpen={isDeleteConfirmOpen}
+          onClose={handleDeleteCancel}
+          onConfirm={handleDeleteConfirm}
+          title="Eliminar Datos Financieros"
+          message="¿Estás seguro de que quieres eliminar los datos financieros de este país? Esta acción no se puede deshacer."
+          confirmLabel="Eliminar"
+          cancelLabel="Cancelar"
+          confirmVariant="danger"
+          isLoading={isDeleting}
         />
       </DashboardLayout>
     </TrackedPage>
