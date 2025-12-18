@@ -8,9 +8,9 @@ services:
     environment:
       - APP_NAME=financial-backend
       - SERVER_PORT=8080
-      - DATABASE_URL=jdbc:postgresql://ls-734c4c0221557364cefeca20c8077e3794b503b8.ca72om4ucz7k.us-east-1.rds.amazonaws.com:5432/savinco_financial
-      - DATABASE_USERNAME=dbmasteruser
-      - DATABASE_PASSWORD=}ia-]>3ggRxo]YvTuviPO>]f(teRlL<0
+      - DATABASE_URL=jdbc:postgresql://your-database-host:5432/your_database_name
+      - DATABASE_USERNAME=your_database_user
+      - DATABASE_PASSWORD=your_database_password
       - DATABASE_DRIVER=org.postgresql.Driver
       - JPA_DDL_AUTO=validate
       - JPA_SHOW_SQL=false
@@ -53,7 +53,7 @@ services:
       - PUBLIC_APP_NAME="Savinco Frontend"
       - PUBLIC_APP_VERSION=1.0.0
       # Optional: PostHog configuration
-      - PUBLIC_POSTHOG_KEY=phc_i4kQhL9aYB9ysiLPoE5BDLKJSumLl0klAHzzpqZtnfC
+      - PUBLIC_POSTHOG_KEY=your_posthog_key
       - PUBLIC_POSTHOG_HOST=https://eu.i.posthog.com
     depends_on:
       financial-backend:
