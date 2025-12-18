@@ -1,3 +1,4 @@
+import { useTrackedButton } from '../../../../../shared/analytics';
 import { Button } from '../../../../../shared/ui/components/Button';
 import { Card } from '../../../../../shared/ui/components/Card';
 import { formatCurrency } from '../../../../../shared/utils';
@@ -16,6 +17,23 @@ export const FinancialDataCard = ({
   onDelete,
   isProcessing = false,
 }: FinancialDataCardProps) => {
+  const trackedEditButton = useTrackedButton({
+    actionName: 'financial_data_edit',
+    section: 'financial-data-card',
+    baseProperties: {
+      countryCode: item.countryCode,
+      countryName: item.countryName,
+    },
+  });
+  const trackedDeleteButton = useTrackedButton({
+    actionName: 'financial_data_delete',
+    section: 'financial-data-card',
+    baseProperties: {
+      countryCode: item.countryCode,
+      countryName: item.countryName,
+    },
+  });
+
   const getCountryFlag = (countryCode: CountryCode): string => {
     const flags: Record<CountryCode, string> = {
       ECU: '🇪🇨',
@@ -76,7 +94,7 @@ export const FinancialDataCard = ({
         <div className="flex gap-2 border-t border-gray-200 pt-3">
           <Button
             variant="secondary"
-            onClick={() => onEdit(item.countryCode)}
+            onClick={trackedEditButton.onClick(() => onEdit(item.countryCode))}
             disabled={isProcessing}
             className="flex-1"
           >
@@ -102,7 +120,7 @@ export const FinancialDataCard = ({
           </Button>
           <Button
             variant="secondary"
-            onClick={() => onDelete(item.countryCode)}
+            onClick={trackedDeleteButton.onClick(() => onDelete(item.countryCode))}
             disabled={isProcessing}
             className="flex-1 text-red-600 hover:bg-red-50 hover:text-red-700"
           >

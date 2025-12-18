@@ -1,5 +1,6 @@
 import type { FormEvent } from 'react';
 import { useState } from 'react';
+import { useTrackedForm } from '../../../../../shared/analytics';
 import { Button } from '../../../../../shared/ui/components/Button';
 import { ErrorMessage } from '../../../../../shared/ui/components/ErrorMessage';
 import { Input } from '../../../../../shared/ui/components/Input';
@@ -20,6 +21,11 @@ export const CurrencyForm = ({
   onSubmit,
   onCancel,
 }: CurrencyFormProps) => {
+  const trackedForm = useTrackedForm({
+    formName: 'currency_form',
+    section: 'currency-form',
+    isEdit: !!initialValue,
+  });
   const [code, setCode] = useState<string>(initialValue?.code ?? '');
   const [name, setName] = useState<string>(initialValue?.name ?? '');
   const [isBase, setIsBase] = useState<boolean>(initialValue?.isBase ?? false);
@@ -44,12 +50,22 @@ export const CurrencyForm = ({
       return;
     }
 
-    await onSubmit({
+    const value: CreateCurrencyInput = {
       code: currencyCode as never,
       name: name.trim(),
       isBase,
       exchangeRateToBase: exchangeRate,
-    });
+    };
+
+    await trackedForm.onSubmit(
+      async () => {
+        await onSubmit(value);
+      },
+      {
+        currencyCode: currencyCode,
+        isBase,
+      }
+    );
   };
 
   const handleIsBaseChange = (checked: boolean) => {
@@ -143,7 +159,15 @@ export const CurrencyForm = ({
           {isSubmitting ? 'Guardando...' : 'Guardar'}
         </Button>
         {onCancel ? (
-          <Button type="button" variant="secondary" onClick={onCancel} disabled={isSubmitting}>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => {
+              trackedForm.onCancel({ currencyCode: code || undefined });
+              onCancel();
+            }}
+            disabled={isSubmitting}
+          >
             Cancelar
           </Button>
         ) : null}

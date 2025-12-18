@@ -20,6 +20,8 @@ export const useGetSummary = () => {
   }, [repository]);
 
   useEffect(() => {
+    // Recargar cuando el summary se invalida (se pone en null) o cuando no hay summary y no está cargando
+    // Esto asegura que cuando se hace create/update/delete, el summary se recarga automáticamente
     if (!summary && !isLoading && !error) {
       void load();
     }

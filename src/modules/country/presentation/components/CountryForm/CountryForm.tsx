@@ -1,5 +1,6 @@
 import type { FormEvent } from 'react';
 import { useState } from 'react';
+import { useTrackedForm } from '../../../../../shared/analytics';
 import { Button } from '../../../../../shared/ui/components/Button';
 import { ErrorMessage } from '../../../../../shared/ui/components/ErrorMessage';
 import { Input } from '../../../../../shared/ui/components/Input';
@@ -20,6 +21,11 @@ export const CountryForm = ({
   onSubmit,
   onCancel,
 }: CountryFormProps) => {
+  const trackedForm = useTrackedForm({
+    formName: 'country_form',
+    section: 'country-form',
+    isEdit: !!initialValue,
+  });
   const [code, setCode] = useState<string>(initialValue?.code ?? '');
   const [name, setName] = useState<string>(initialValue?.name ?? '');
   const [currencyCode, setCurrencyCode] = useState<string>(initialValue?.currencyCode ?? '');
@@ -37,11 +43,21 @@ export const CountryForm = ({
       return;
     }
 
-    await onSubmit({
+    const value: CreateCountryInput = {
       code: countryCode as never,
       name: name.trim(),
       currencyCode: currCode as never,
-    });
+    };
+
+    await trackedForm.onSubmit(
+      async () => {
+        await onSubmit(value);
+      },
+      {
+        countryCode: countryCode,
+        currencyCode: currCode,
+      }
+    );
   };
 
   return (
@@ -118,7 +134,15 @@ export const CountryForm = ({
           {isSubmitting ? 'Guardando...' : 'Guardar'}
         </Button>
         {onCancel ? (
-          <Button type="button" variant="secondary" onClick={onCancel} disabled={isSubmitting}>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => {
+              trackedForm.onCancel({ countryCode: code || undefined });
+              onCancel();
+            }}
+            disabled={isSubmitting}
+          >
             Cancelar
           </Button>
         ) : null}

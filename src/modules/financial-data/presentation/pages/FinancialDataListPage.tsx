@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { TrackedPage } from '../../../../shared/analytics';
+import { TrackedPage, useTrackedOperation } from '../../../../shared/analytics';
 import { useDashboardEntities } from '../../../../shared/dashboard';
 import { useAppDispatch } from '../../../../shared/redux/store';
 import { ConfirmModal } from '../../../../shared/ui/components/ConfirmModal';
@@ -19,6 +19,10 @@ import { useUpdateFinancialData } from '../hooks/use-update-financial-data';
 
 export const FinancialDataListPage = () => {
   const dispatch = useAppDispatch();
+  const trackedOperation = useTrackedOperation({
+    entityName: 'financial_data',
+    section: 'financial-data-list',
+  });
   const { items, isLoading, error, reload } = useGetAllFinancialData();
   const { create, isMutating: isCreating, error: createError } = useCreateFinancialData();
   const { update, isMutating: isUpdating, error: updateError } = useUpdateFinancialData();
@@ -37,15 +41,25 @@ export const FinancialDataListPage = () => {
   const entities = useDashboardEntities();
 
   const handleCreateClick = () => {
+    trackedOperation.trackClick('create');
     dispatch(financialDataActions.clearMutationError());
     setIsCreateModalOpen(true);
   };
 
   const handleCreateSubmit = async (value: FinancialDataInput) => {
     try {
-      await create(value);
-      await reload();
-      setIsCreateModalOpen(false);
+      await trackedOperation.execute(
+        'create',
+        async () => {
+          await create(value);
+          await reload();
+          setIsCreateModalOpen(false);
+        },
+        {
+          countryCode: value.countryCode,
+          currencyCode: value.currencyCode,
+        }
+      );
     } catch {
       // Error ya está manejado por el hook y se muestra en el modal
       // No cerramos el modal para que el usuario pueda ver el error
@@ -53,6 +67,7 @@ export const FinancialDataListPage = () => {
   };
 
   const handleEditClick = async (countryCode: CountryCode) => {
+    trackedOperation.trackModalOpened('edit', { countryCode });
     setEditingCountryCode(countryCode);
     setIsEditModalOpen(true);
 
@@ -77,12 +92,22 @@ export const FinancialDataListPage = () => {
   const handleEditSubmit = async (value: FinancialDataInput) => {
     if (!editingCountryCode) return;
     try {
-      await update(editingCountryCode, value);
-      await reload();
-      setIsEditModalOpen(false);
-      setEditingCountryCode(null);
-      setEditingCountryName(null);
-      setEditingData(null);
+      await trackedOperation.execute(
+        'update',
+        async () => {
+          await update(editingCountryCode, value);
+          // No necesitamos reload() porque upsertFinancialData ya actualizó el estado en Redux
+          // Solo se actualiza la card del elemento modificado, igual que el delete optimista
+          setIsEditModalOpen(false);
+          setEditingCountryCode(null);
+          setEditingCountryName(null);
+          setEditingData(null);
+        },
+        {
+          countryCode: editingCountryCode,
+          currencyCode: value.currencyCode,
+        }
+      );
     } catch {
       // Error ya está manejado por el hook y se muestra en el modal
       // No cerramos el modal para que el usuario pueda ver el error
@@ -90,6 +115,7 @@ export const FinancialDataListPage = () => {
   };
 
   const handleDeleteClick = (countryCode: CountryCode) => {
+    trackedOperation.trackModalOpened('delete', { countryCode });
     setDeletingCountryCode(countryCode);
     setIsDeleteConfirmOpen(true);
   };
@@ -97,16 +123,24 @@ export const FinancialDataListPage = () => {
   const handleDeleteConfirm = async () => {
     if (!deletingCountryCode) return;
 
+    const countryCodeToDelete = deletingCountryCode;
+    trackedOperation.trackConfirmed('delete', { countryCode: countryCodeToDelete });
+
     // Cerrar modal inmediatamente para mejor UX (delete optimista ya actualiza el UI)
     setIsDeleteConfirmOpen(false);
-    const countryCodeToDelete = deletingCountryCode;
     setDeletingCountryCode(null);
 
     // Ejecutar eliminación en background
     try {
-      await remove(countryCodeToDelete);
-      // No necesitamos reload() porque el delete optimista ya actualizó el estado
-      // Si hay error, se manejará y se mostrará en el estado de error
+      await trackedOperation.execute(
+        'delete',
+        async () => {
+          await remove(countryCodeToDelete);
+          // No necesitamos reload() porque el delete optimista ya actualizó el estado
+          // Si hay error, se manejará y se mostrará en el estado de error
+        },
+        { countryCode: countryCodeToDelete }
+      );
     } catch {
       // Error ya está manejado por el hook y se muestra en el estado
       // El delete optimista ya se hizo, pero si falla la API, el item volverá al recargar

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { TrackedPage } from '../../../../shared/analytics';
+import { TrackedPage, useTrackedOperation } from '../../../../shared/analytics';
 import { useDashboardEntities } from '../../../../shared/dashboard';
 import { ErrorMessage } from '../../../../shared/ui/components/ErrorMessage';
 import { LoadingSpinner } from '../../../../shared/ui/components/LoadingSpinner';
@@ -11,6 +11,10 @@ import { useCreateCountry } from '../hooks/use-create-country';
 import { useGetAllCountries } from '../hooks/use-get-all-countries';
 
 export const CountryListPage = () => {
+  const trackedOperation = useTrackedOperation({
+    entityName: 'country',
+    section: 'country-list',
+  });
   const { items, isLoading, error, reload } = useGetAllCountries();
   const { create, isMutating: isCreating, error: createError } = useCreateCountry();
 
@@ -20,13 +24,27 @@ export const CountryListPage = () => {
   const entities = useDashboardEntities();
 
   const handleCreateClick = () => {
+    trackedOperation.trackClick('create');
     setIsCreateModalOpen(true);
   };
 
   const handleCreateSubmit = async (value: CreateCountryInput) => {
-    await create(value);
-    await reload();
-    setIsCreateModalOpen(false);
+    try {
+      await trackedOperation.execute(
+        'create',
+        async () => {
+          await create(value);
+          await reload();
+          setIsCreateModalOpen(false);
+        },
+        {
+          countryCode: value.code,
+          currencyCode: value.currencyCode,
+        }
+      );
+    } catch {
+      // Error ya está manejado
+    }
   };
 
   const handleCloseCreateModal = () => {
