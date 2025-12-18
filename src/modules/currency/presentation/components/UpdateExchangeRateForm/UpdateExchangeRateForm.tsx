@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useTrackedForm } from '../../../../../shared/analytics';
 import { Button } from '../../../../../shared/ui/components/Button';
 import { ErrorMessage } from '../../../../../shared/ui/components/ErrorMessage';
-import { Input } from '../../../../../shared/ui/components/Input';
+import { NumericInput } from '../../../../../shared/ui/components/NumericInput';
 import type { UpdateExchangeRateInput } from '../../../domain/types';
 import { useBaseCurrency } from '../../hooks/use-base-currency';
 
@@ -65,19 +65,17 @@ export const UpdateExchangeRateForm = ({
       {errorMessage ? <ErrorMessage>{errorMessage}</ErrorMessage> : null}
 
       <div>
-        <label htmlFor="exchangeRate" className="mb-1 block text-sm font-medium text-gray-700">
-          Nueva Tasa de Cambio a {baseCurrency?.code ?? 'Moneda Base'}
-        </label>
-        <Input
+        <NumericInput
           id="exchangeRate"
-          type="number"
-          step="0.0000000001"
-          min="0.0000000001"
+          label={`Nueva Tasa de Cambio a ${baseCurrency?.code ?? 'Moneda Base'}`}
           value={exchangeRateToBase}
-          onChange={(e) => setExchangeRateToBase(e.target.value)}
+          onChange={setExchangeRateToBase}
           placeholder="1.1111111111"
           required
           disabled={isSubmitting}
+          step="0.0000000001"
+          min={0.0000000001}
+          title="Ingrese solo números y un punto decimal (ej: 1.1111111111)"
         />
         <p className="mt-1 text-xs text-gray-500">
           {baseCurrency
