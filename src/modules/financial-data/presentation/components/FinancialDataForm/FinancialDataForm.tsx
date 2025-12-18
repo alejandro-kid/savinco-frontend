@@ -5,6 +5,7 @@ import { ErrorMessage } from '../../../../../shared/ui/components/ErrorMessage';
 import { Input } from '../../../../../shared/ui/components/Input';
 import { CountryCode, CurrencyCode, type FinancialDataInput } from '../../../domain/types';
 import { CountryCodeSelect } from '../CountryCodeSelect';
+import { FinancialDataNumericFields } from '../FinancialDataNumericFields';
 
 export interface FinancialDataFormProps {
   initialValue?: FinancialDataInput;
@@ -51,12 +52,22 @@ export const FinancialDataForm = ({
     event.preventDefault();
     if (!countryCode) return;
 
+    // Validar que los valores sean números válidos
+    const capitalSavedNum = parseFloat(capitalSaved) || 0;
+    const capitalLoanedNum = parseFloat(capitalLoaned) || 0;
+    const profitsGeneratedNum = parseFloat(profitsGenerated) || 0;
+
+    // Validar que no sean negativos
+    if (capitalSavedNum < 0 || capitalLoanedNum < 0 || profitsGeneratedNum < 0) {
+      return;
+    }
+
     const value: FinancialDataInput = {
       countryCode,
       currencyCode: getDefaultCurrencyForCountry(countryCode) as CurrencyCode,
-      capitalSaved: Number(capitalSaved || 0),
-      capitalLoaned: Number(capitalLoaned || 0),
-      profitsGenerated: Number(profitsGenerated || 0),
+      capitalSaved: capitalSavedNum,
+      capitalLoaned: capitalLoanedNum,
+      profitsGenerated: profitsGeneratedNum,
     };
 
     await onSubmit(value);
@@ -92,52 +103,15 @@ export const FinancialDataForm = ({
         </div>
       </div>
 
-      <div className="grid gap-3 md:grid-cols-3">
-        <div>
-          <label htmlFor="capital-saved" className="mb-1 block text-xs font-medium text-gray-700">
-            Capital Ahorrado
-          </label>
-          <Input
-            id="capital-saved"
-            type="number"
-            min={0}
-            step="0.01"
-            value={capitalSaved}
-            onChange={(event) => setCapitalSaved(event.target.value)}
-          />
-        </div>
-
-        <div>
-          <label htmlFor="capital-loaned" className="mb-1 block text-xs font-medium text-gray-700">
-            Capital Prestado
-          </label>
-          <Input
-            id="capital-loaned"
-            type="number"
-            min={0}
-            step="0.01"
-            value={capitalLoaned}
-            onChange={(event) => setCapitalLoaned(event.target.value)}
-          />
-        </div>
-
-        <div>
-          <label
-            htmlFor="profits-generated"
-            className="mb-1 block text-xs font-medium text-gray-700"
-          >
-            Utilidades Generadas
-          </label>
-          <Input
-            id="profits-generated"
-            type="number"
-            min={0}
-            step="0.01"
-            value={profitsGenerated}
-            onChange={(event) => setProfitsGenerated(event.target.value)}
-          />
-        </div>
-      </div>
+      {/* Campos numéricos */}
+      <FinancialDataNumericFields
+        capitalSaved={capitalSaved}
+        capitalLoaned={capitalLoaned}
+        profitsGenerated={profitsGenerated}
+        onCapitalSavedChange={setCapitalSaved}
+        onCapitalLoanedChange={setCapitalLoaned}
+        onProfitsGeneratedChange={setProfitsGenerated}
+      />
 
       <div className="flex gap-2 pt-2">
         <Button type="submit" disabled={isSubmitting || !countryCode}>

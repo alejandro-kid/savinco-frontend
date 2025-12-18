@@ -1,3 +1,4 @@
+import { parseApiError } from '../../../../shared/http/error-handler';
 import { store } from '../../../../shared/redux/store';
 import type { FinancialDataRepository } from '../../domain/repository.interface';
 import type {
@@ -24,10 +25,14 @@ export const financialDataRepository: FinancialDataRepository = {
       const response = await financialDataApiClient.create(dto);
       const financialData = mapFinancialDataFromResponseDTO(response);
       store.dispatch(financialDataActions.upsertFinancialData(financialData));
+      store.dispatch(financialDataActions.invalidateSummary());
       store.dispatch(financialDataActions.mutationEnded());
       return financialData;
     } catch (error) {
-      store.dispatch(financialDataActions.mutationFailed('No se pudieron cargar los datos'));
+      const apiError = parseApiError(error);
+      const errorMessage =
+        apiError?.message || 'No se pudieron crear los datos financieros. Intente nuevamente.';
+      store.dispatch(financialDataActions.mutationFailed(errorMessage));
       throw error;
     }
   },
@@ -39,23 +44,40 @@ export const financialDataRepository: FinancialDataRepository = {
       const response = await financialDataApiClient.update(countryCode, dto);
       const financialData = mapFinancialDataFromResponseDTO(response);
       store.dispatch(financialDataActions.upsertFinancialData(financialData));
+      store.dispatch(financialDataActions.invalidateSummary());
       store.dispatch(financialDataActions.mutationEnded());
       return financialData;
     } catch (error) {
-      store.dispatch(financialDataActions.mutationFailed('No se pudieron cargar los datos'));
+      const apiError = parseApiError(error);
+      const errorMessage =
+        apiError?.message || 'No se pudieron actualizar los datos financieros. Intente nuevamente.';
+      store.dispatch(financialDataActions.mutationFailed(errorMessage));
       throw error;
     }
   },
 
   async delete(countryCode: CountryCode): Promise<void> {
-    // Optimistic delete
+    store.dispatch(financialDataActions.mutationStarted());
+    // Optimistic delete - actualiza UI inmediatamente
     store.dispatch(financialDataActions.deleteFinancialDataOptimistic(countryCode));
+    store.dispatch(financialDataActions.invalidateSummary());
     try {
       await financialDataApiClient.delete(countryCode);
+      store.dispatch(financialDataActions.mutationEnded());
     } catch (error) {
-      // Rollback strategy (simple version: refetch list)
-      store.dispatch(financialDataActions.mutationFailed('No se pudieron cargar los datos'));
-      // The calling use case will decide whether to refetch list/summary.
+      const apiError = parseApiError(error);
+      const errorMessage =
+        apiError?.message || 'No se pudieron eliminar los datos financieros. Intente nuevamente.';
+      store.dispatch(financialDataActions.mutationFailed(errorMessage));
+      // Rollback: recargar lista para restaurar el estado correcto
+      try {
+        const response = await financialDataApiClient.getAll();
+        const items = mapFinancialDataArrayFromResponseDTO(response);
+        store.dispatch(financialDataActions.requestListSucceeded(items));
+      } catch (reloadError) {
+        // Si falla el reload, al menos mostramos el error
+        console.error('Error al recargar lista después de fallo en delete:', reloadError);
+      }
       throw error;
     }
   },
@@ -68,7 +90,10 @@ export const financialDataRepository: FinancialDataRepository = {
       store.dispatch(financialDataActions.requestListSucceeded(items));
       return items;
     } catch (error) {
-      store.dispatch(financialDataActions.requestListFailed('No se pudieron cargar los datos'));
+      const apiError = parseApiError(error);
+      const errorMessage =
+        apiError?.message || 'No se pudieron cargar los datos financieros. Intente nuevamente.';
+      store.dispatch(financialDataActions.requestListFailed(errorMessage));
       throw error;
     }
   },
@@ -86,7 +111,10 @@ export const financialDataRepository: FinancialDataRepository = {
       store.dispatch(financialDataActions.requestSummarySucceeded(summary));
       return summary;
     } catch (error) {
-      store.dispatch(financialDataActions.requestSummaryFailed('No se pudieron cargar los datos'));
+      const apiError = parseApiError(error);
+      const errorMessage =
+        apiError?.message || 'No se pudieron cargar los datos financieros. Intente nuevamente.';
+      store.dispatch(financialDataActions.requestSummaryFailed(errorMessage));
       throw error;
     }
   },
