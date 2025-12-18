@@ -1,5 +1,6 @@
 import type { FormEvent } from 'react';
 import { useEffect, useState } from 'react';
+import { useTrackedForm } from '../../../../../shared/analytics';
 import { Button } from '../../../../../shared/ui/components/Button';
 import { ErrorMessage } from '../../../../../shared/ui/components/ErrorMessage';
 import { Input } from '../../../../../shared/ui/components/Input';
@@ -20,6 +21,10 @@ export const UpdateExchangeRateForm = ({
   onSubmit,
   onCancel,
 }: UpdateExchangeRateFormProps) => {
+  const trackedForm = useTrackedForm({
+    formName: 'currency_exchange_rate_form',
+    section: 'update-exchange-rate-form',
+  });
   const [exchangeRateToBase, setExchangeRateToBase] = useState<string>(
     initialValue?.toString() ?? ''
   );
@@ -38,9 +43,19 @@ export const UpdateExchangeRateForm = ({
       return;
     }
 
-    await onSubmit({
+    const value: UpdateExchangeRateInput = {
       exchangeRateToBase: exchangeRate,
-    });
+    };
+
+    await trackedForm.onSubmit(
+      async () => {
+        await onSubmit(value);
+      },
+      {
+        previousRate: initialValue,
+        newRate: exchangeRate,
+      }
+    );
   };
 
   return (
@@ -72,7 +87,15 @@ export const UpdateExchangeRateForm = ({
           {isSubmitting ? 'Actualizando...' : 'Actualizar Tasa'}
         </Button>
         {onCancel ? (
-          <Button type="button" variant="secondary" onClick={onCancel} disabled={isSubmitting}>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => {
+              trackedForm.onCancel({ previousRate: initialValue });
+              onCancel();
+            }}
+            disabled={isSubmitting}
+          >
             Cancelar
           </Button>
         ) : null}

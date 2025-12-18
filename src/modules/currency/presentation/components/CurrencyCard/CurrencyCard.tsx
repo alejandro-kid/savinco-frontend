@@ -1,3 +1,4 @@
+import { useTrackedButton } from '../../../../../shared/analytics';
 import { Button } from '../../../../../shared/ui/components/Button';
 import { Card } from '../../../../../shared/ui/components/Card';
 import type { Currency, CurrencyCode } from '../../../domain/types';
@@ -9,6 +10,15 @@ export interface CurrencyCardProps {
 }
 
 export const CurrencyCard = ({ item, onEdit, isProcessing = false }: CurrencyCardProps) => {
+  const trackedEditButton = useTrackedButton({
+    actionName: 'currency_edit',
+    section: 'currency-card',
+    baseProperties: {
+      currencyCode: item.code,
+      currencyName: item.name,
+    },
+  });
+
   return (
     <Card className="group relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-[1.02]">
       <div className="relative">
@@ -56,7 +66,7 @@ export const CurrencyCard = ({ item, onEdit, isProcessing = false }: CurrencyCar
           <div className="flex gap-2 border-t border-gray-200 pt-3">
             <Button
               variant="secondary"
-              onClick={() => onEdit(item.code)}
+              onClick={trackedEditButton.onClick(() => onEdit(item.code))}
               disabled={isProcessing}
               className="flex-1"
             >
