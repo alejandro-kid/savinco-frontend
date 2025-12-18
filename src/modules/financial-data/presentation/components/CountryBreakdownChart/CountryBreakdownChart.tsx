@@ -8,7 +8,8 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { formatCurrency } from '../../../../../shared/utils';
+import { useFormatCurrency } from '../../../../../shared/utils/use-format-currency';
+import { useBaseCurrency } from '../../../../currency/presentation/hooks/use-base-currency';
 import type { FinancialDataByCountrySummary } from '../../../domain/types';
 
 type CountryBreakdownChartProps = {
@@ -17,15 +18,18 @@ type CountryBreakdownChartProps = {
 
 const THOUSAND_DIVISOR = 1000;
 
-const formatCurrencyInThousands = (value: number): string => {
-  const valueInThousands = value / THOUSAND_DIVISOR;
-  return formatCurrency(valueInThousands, {
-    maximumFractionDigits: 0,
-    minimumFractionDigits: 0,
-  });
-};
-
 export const CountryBreakdownChart = ({ data }: CountryBreakdownChartProps) => {
+  const baseCurrency = useBaseCurrency();
+  const formatCurrency = useFormatCurrency();
+
+  const formatCurrencyInThousands = (value: number): string => {
+    const valueInThousands = value / THOUSAND_DIVISOR;
+    return formatCurrency(valueInThousands, {
+      maximumFractionDigits: 0,
+      minimumFractionDigits: 0,
+    });
+  };
+
   const chartData = data.map((item) => ({
     name: item.countryName,
     'Capital Ahorrado': item.capitalSaved / THOUSAND_DIVISOR,
@@ -37,7 +41,9 @@ export const CountryBreakdownChart = ({ data }: CountryBreakdownChartProps) => {
   return (
     <div className="w-full">
       <div className="mb-2 text-center">
-        <p className="text-xs text-gray-500">Valores mostrados en miles (×1,000 USD)</p>
+        <p className="text-xs text-gray-500">
+          Valores mostrados en miles (×1,000 {baseCurrency?.code ?? 'Moneda Base'})
+        </p>
       </div>
       <ResponsiveContainer width="100%" height={400}>
         <BarChart

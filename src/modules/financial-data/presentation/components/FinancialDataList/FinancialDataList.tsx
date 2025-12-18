@@ -2,7 +2,7 @@ import { Button } from '../../../../../shared/ui/components/Button';
 import { Card } from '../../../../../shared/ui/components/Card';
 import { ErrorMessage } from '../../../../../shared/ui/components/ErrorMessage';
 import { LoadingSpinner } from '../../../../../shared/ui/components/LoadingSpinner';
-import { formatCurrency } from '../../../../../shared/utils';
+import { useFormatCurrency } from '../../../../../shared/utils/use-format-currency';
 import type { CountryCode, FinancialData } from '../../../domain/types';
 
 export interface FinancialDataListProps {
@@ -26,6 +26,8 @@ export const FinancialDataList = ({
   onDeleteClick,
   onRetry,
 }: FinancialDataListProps) => {
+  const formatCurrency = useFormatCurrency();
+
   return (
     <Card title="Datos Financieros por País">
       <div className="mb-3 flex items-center justify-between gap-2">
@@ -72,17 +74,15 @@ export const FinancialDataList = ({
                   Moneda Original
                 </th>
                 <th className="px-3 py-2 text-right text-xs font-medium text-gray-500">
-                  Capital Ahorrado (USD)
+                  Capital Ahorrado
                 </th>
                 <th className="px-3 py-2 text-right text-xs font-medium text-gray-500">
-                  Capital Prestado (USD)
+                  Capital Prestado
                 </th>
                 <th className="px-3 py-2 text-right text-xs font-medium text-gray-500">
-                  Utilidades Generadas (USD)
+                  Utilidades Generadas
                 </th>
-                <th className="px-3 py-2 text-right text-xs font-medium text-gray-500">
-                  Total (USD)
-                </th>
+                <th className="px-3 py-2 text-right text-xs font-medium text-gray-500">Total</th>
                 <th className="px-3 py-2 text-right text-xs font-medium text-gray-500">Acciones</th>
               </tr>
             </thead>

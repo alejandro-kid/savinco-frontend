@@ -1,17 +1,26 @@
 import type { SelectHTMLAttributes } from 'react';
+import { useAppSelector } from '../../../../../shared/redux/store';
 import { Select } from '../../../../../shared/ui/components/Select';
-import { CountryCode } from '../../../domain/types';
+import { selectAllCountries } from '../../../../country/infrastructure/redux/country.selectors';
+import { useGetAllCountries } from '../../../../country/presentation/hooks/use-get-all-countries';
 
 export type CountryCodeSelectProps = SelectHTMLAttributes<HTMLSelectElement>;
 
 export const CountryCodeSelect = (props: CountryCodeSelectProps) => {
+  // Cargar países desde Redux
+  useGetAllCountries();
+  const countries = useAppSelector(selectAllCountries);
+
   return (
-    <Select {...props}>
-      <option value="">Selecciona un país</option>
-      <option value={CountryCode.ECU}>Ecuador (ECU)</option>
-      <option value={CountryCode.ESP}>España (ESP)</option>
-      <option value={CountryCode.PER}>Perú (PER)</option>
-      <option value={CountryCode.NPL}>Nepal (NPL)</option>
+    <Select {...props} key={`country-select-${countries.length}`}>
+      <option key="empty-option" value="">
+        Selecciona un país
+      </option>
+      {countries.map((country) => (
+        <option key={country.code} value={country.code}>
+          {country.name} ({country.code})
+        </option>
+      ))}
     </Select>
   );
 };

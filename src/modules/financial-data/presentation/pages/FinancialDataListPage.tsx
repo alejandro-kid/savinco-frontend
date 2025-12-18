@@ -26,7 +26,7 @@ export const FinancialDataListPage = () => {
   const { items, isLoading, error, reload } = useGetAllFinancialData();
   const { create, isMutating: isCreating, error: createError } = useCreateFinancialData();
   const { update, isMutating: isUpdating, error: updateError } = useUpdateFinancialData();
-  const { remove, isMutating: isDeleting, error: deleteError } = useDeleteFinancialData();
+  const { remove, isMutating: isDeleting } = useDeleteFinancialData();
   const { load: loadForEdit, isLoading: isLoadingEdit } = useGetByCountry();
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -52,7 +52,8 @@ export const FinancialDataListPage = () => {
         'create',
         async () => {
           await create(value);
-          await reload();
+          // No necesitamos reload() porque upsertFinancialData ya actualizó el estado en Redux
+          // Solo se agrega el nuevo elemento, igual que el update y delete optimista
           setIsCreateModalOpen(false);
         },
         {
@@ -60,7 +61,7 @@ export const FinancialDataListPage = () => {
           currencyCode: value.currencyCode,
         }
       );
-    } catch {
+    } catch (_error) {
       // Error ya está manejado por el hook y se muestra en el modal
       // No cerramos el modal para que el usuario pueda ver el error
     }
@@ -167,8 +168,9 @@ export const FinancialDataListPage = () => {
   };
 
   const isProcessing = isCreating || isUpdating || isDeleting || isLoadingEdit;
-  // Mostrar errores de carga y errores de eliminación en el dashboard
-  const errorMessage = error || deleteError;
+  // Solo mostrar errores de carga en el dashboard (no errores de mutaciones)
+  // Los errores de create/update se muestran en el modal, no en el dashboard
+  const errorMessage = error;
 
   return (
     <TrackedPage pageName="Dashboard" properties={{ section: 'financial-data-list' }}>
@@ -241,7 +243,9 @@ export const FinancialDataListPage = () => {
         ) : null}
 
         {/* Cards Grid */}
-        {!isLoading && !errorMessage && items.length > 0 ? (
+        {/* Mostrar cards si hay items, independientemente de errores de mutación */}
+        {/* Solo ocultar si hay un error de carga (error) o si está cargando la lista inicial */}
+        {!isLoading && items.length > 0 ? (
           <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
             {items.map((item) => (
               <FinancialDataCard

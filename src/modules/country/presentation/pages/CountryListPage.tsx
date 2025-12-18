@@ -1,24 +1,36 @@
 import { useState } from 'react';
 import { TrackedPage, useTrackedOperation } from '../../../../shared/analytics';
 import { useDashboardEntities } from '../../../../shared/dashboard';
+import { parseApiError } from '../../../../shared/http/error-handler';
+import { useAppDispatch } from '../../../../shared/redux/store';
+import { ConfirmModal } from '../../../../shared/ui/components/ConfirmModal';
 import { ErrorMessage } from '../../../../shared/ui/components/ErrorMessage';
+import { ErrorModal } from '../../../../shared/ui/components/ErrorModal/ErrorModal';
 import { LoadingSpinner } from '../../../../shared/ui/components/LoadingSpinner';
 import { DashboardLayout } from '../../../financial-data/presentation/components/DashboardLayout';
-import type { CreateCountryInput } from '../../domain/types';
+import type { CountryCode, CreateCountryInput } from '../../domain/types';
+import { countryActions } from '../../infrastructure/redux/country.slice';
 import { CountryCard } from '../components/CountryCard';
 import { CountryModal } from '../components/CountryModal';
 import { useCreateCountry } from '../hooks/use-create-country';
+import { useDeleteCountry } from '../hooks/use-delete-country';
 import { useGetAllCountries } from '../hooks/use-get-all-countries';
 
 export const CountryListPage = () => {
+  const dispatch = useAppDispatch();
   const trackedOperation = useTrackedOperation({
     entityName: 'country',
     section: 'country-list',
   });
   const { items, isLoading, error, reload } = useGetAllCountries();
   const { create, isMutating: isCreating, error: createError } = useCreateCountry();
+  const { remove, isMutating: isDeleting } = useDeleteCountry();
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+  const [errorModalMessage, setErrorModalMessage] = useState<string>('');
+  const [deletingCountryCode, setDeletingCountryCode] = useState<CountryCode | null>(null);
 
   // Obtener entidades del dashboard desde la configuración centralizada
   const entities = useDashboardEntities();
@@ -34,7 +46,8 @@ export const CountryListPage = () => {
         'create',
         async () => {
           await create(value);
-          await reload();
+          // No necesitamos reload() porque upsertCountry ya actualizó el estado en Redux
+          // Solo se agrega el nuevo elemento, igual que el update y delete optimista
           setIsCreateModalOpen(false);
         },
         {
@@ -47,10 +60,55 @@ export const CountryListPage = () => {
     }
   };
 
+  const handleDeleteClick = (code: CountryCode) => {
+    trackedOperation.trackModalOpened('delete', { countryCode: code });
+    setDeletingCountryCode(code);
+    setIsDeleteConfirmOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deletingCountryCode) return;
+
+    const countryCodeToDelete = deletingCountryCode;
+    trackedOperation.trackConfirmed('delete', { countryCode: countryCodeToDelete });
+
+    // Cerrar modal de confirmación
+    setIsDeleteConfirmOpen(false);
+    setDeletingCountryCode(null);
+
+    // Ejecutar eliminación
+    try {
+      await trackedOperation.execute(
+        'delete',
+        async () => {
+          await remove(countryCodeToDelete);
+          // Si la eliminación es exitosa, el repositorio actualiza Redux
+        },
+        { countryCode: countryCodeToDelete }
+      );
+    } catch (error) {
+      // Capturar error y mostrarlo en un modal
+      const apiError = parseApiError(error);
+      const errorMessage = apiError?.message || 'No se pudo eliminar el país. Intente nuevamente.';
+      setErrorModalMessage(errorMessage);
+      setIsErrorModalOpen(true);
+      // NO cambiamos nada en el dashboard - los datos quedan igual
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    dispatch(countryActions.setMutationError(null));
+    setIsDeleteConfirmOpen(false);
+    setDeletingCountryCode(null);
+  };
+
   const handleCloseCreateModal = () => {
+    dispatch(countryActions.setMutationError(null));
     setIsCreateModalOpen(false);
   };
 
+  const isProcessing = isCreating || isDeleting;
+  // Solo mostrar errores de carga en el dashboard (no errores de eliminación)
   const errorMessage = error || createError;
 
   return (
@@ -127,7 +185,12 @@ export const CountryListPage = () => {
         {!isLoading && !errorMessage && items.length > 0 ? (
           <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
             {items.map((item) => (
-              <CountryCard key={item.code} item={item} />
+              <CountryCard
+                key={item.code}
+                item={item}
+                onDelete={handleDeleteClick}
+                isProcessing={isProcessing}
+              />
             ))}
           </div>
         ) : null}
@@ -140,6 +203,31 @@ export const CountryListPage = () => {
           onSubmit={handleCreateSubmit}
           isSubmitting={isCreating}
           errorMessage={createError}
+        />
+
+        {/* Delete Confirmation Modal */}
+        <ConfirmModal
+          isOpen={isDeleteConfirmOpen}
+          onClose={handleDeleteCancel}
+          onConfirm={handleDeleteConfirm}
+          title="Eliminar País"
+          message="¿Estás seguro de que quieres eliminar este país? Esta acción no se puede deshacer."
+          confirmLabel="Eliminar"
+          cancelLabel="Cancelar"
+          confirmVariant="danger"
+          isLoading={isDeleting}
+        />
+
+        {/* Error Modal */}
+        <ErrorModal
+          isOpen={isErrorModalOpen}
+          onClose={() => {
+            setIsErrorModalOpen(false);
+            setErrorModalMessage('');
+            dispatch(countryActions.setMutationError(null));
+          }}
+          title="Error al Eliminar País"
+          message={errorModalMessage}
         />
       </DashboardLayout>
     </TrackedPage>

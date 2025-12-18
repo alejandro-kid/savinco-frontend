@@ -7,4 +7,5 @@ export interface CountryRepository {
   getAll: () => Promise<Array<Country>>;
   getByCode: (code: string) => Promise<Country | null>;
   create: (input: CreateCountryInput) => Promise<Country>;
+  delete: (code: string) => Promise<void>;
 }

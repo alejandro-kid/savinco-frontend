@@ -25,6 +25,7 @@ export const financialDataRepository: FinancialDataRepository = {
       const response = await financialDataApiClient.create(dto);
       const financialData = mapFinancialDataFromResponseDTO(response);
       store.dispatch(financialDataActions.upsertFinancialData(financialData));
+      // Solo invalidar summary si la operación fue exitosa
       store.dispatch(financialDataActions.invalidateSummary());
       store.dispatch(financialDataActions.mutationEnded());
       return financialData;
@@ -33,6 +34,7 @@ export const financialDataRepository: FinancialDataRepository = {
       const errorMessage =
         apiError?.message || 'No se pudieron crear los datos financieros. Intente nuevamente.';
       store.dispatch(financialDataActions.mutationFailed(errorMessage));
+      // No invalidar summary ni hacer reload cuando hay error
       throw error;
     }
   },
@@ -44,6 +46,7 @@ export const financialDataRepository: FinancialDataRepository = {
       const response = await financialDataApiClient.update(countryCode, dto);
       const financialData = mapFinancialDataFromResponseDTO(response);
       store.dispatch(financialDataActions.upsertFinancialData(financialData));
+      // Solo invalidar summary si la operación fue exitosa
       store.dispatch(financialDataActions.invalidateSummary());
       store.dispatch(financialDataActions.mutationEnded());
       return financialData;
@@ -52,6 +55,7 @@ export const financialDataRepository: FinancialDataRepository = {
       const errorMessage =
         apiError?.message || 'No se pudieron actualizar los datos financieros. Intente nuevamente.';
       store.dispatch(financialDataActions.mutationFailed(errorMessage));
+      // No invalidar summary ni hacer reload cuando hay error
       throw error;
     }
   },
@@ -74,9 +78,8 @@ export const financialDataRepository: FinancialDataRepository = {
         const response = await financialDataApiClient.getAll();
         const items = mapFinancialDataArrayFromResponseDTO(response);
         store.dispatch(financialDataActions.requestListSucceeded(items));
-      } catch (reloadError) {
-        // Si falla el reload, al menos mostramos el error
-        console.error('Error al recargar lista después de fallo en delete:', reloadError);
+      } catch (_reloadError) {
+        // Si falla el reload, el error ya está manejado arriba
       }
       throw error;
     }

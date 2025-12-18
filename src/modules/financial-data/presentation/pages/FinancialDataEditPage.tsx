@@ -4,6 +4,7 @@ import { TrackedPage } from '../../../../shared/analytics';
 import { Card } from '../../../../shared/ui/components/Card';
 import { ErrorMessage } from '../../../../shared/ui/components/ErrorMessage';
 import { LoadingSpinner } from '../../../../shared/ui/components/LoadingSpinner';
+import { useBaseCurrency } from '../../../currency/presentation/hooks/use-base-currency';
 import type { CountryCode, FinancialDataInput } from '../../domain/types';
 import { FinancialDataForm } from '../components/FinancialDataForm';
 import { useGetByCountry } from '../hooks/use-get-by-country';
@@ -11,6 +12,7 @@ import { useUpdateFinancialData } from '../hooks/use-update-financial-data';
 
 export const FinancialDataEditPage = () => {
   const navigate = useNavigate();
+  const baseCurrency = useBaseCurrency();
   const { countryCode } = useParams<{ countryCode: string }>();
   const { load, isLoading: isLoadingData, error: loadError } = useGetByCountry();
   const { update, isMutating, error: updateError } = useUpdateFinancialData();
@@ -19,13 +21,7 @@ export const FinancialDataEditPage = () => {
   // Cargar datos existentes al montar el componente
   useEffect(() => {
     const loadData = async () => {
-      if (
-        countryCode &&
-        (countryCode === 'ECU' ||
-          countryCode === 'ESP' ||
-          countryCode === 'PER' ||
-          countryCode === 'NPL')
-      ) {
+      if (countryCode) {
         try {
           const data = await load(countryCode as CountryCode);
           if (data) {
@@ -54,13 +50,13 @@ export const FinancialDataEditPage = () => {
 
   const handleCancel = () => navigate('/dashboard');
 
-  // Validar que el countryCode sea válido
-  if (!countryCode || !['ECU', 'ESP', 'PER', 'NPL'].includes(countryCode)) {
+  // Validar que el countryCode esté presente
+  if (!countryCode) {
     return (
       <TrackedPage pageName="Edit Financial Data" properties={{ section: 'financial-data-form' }}>
         <main className="mx-auto max-w-3xl px-4 py-8">
           <Card>
-            <ErrorMessage>Código de país inválido</ErrorMessage>
+            <ErrorMessage>Código de país no proporcionado</ErrorMessage>
           </Card>
         </main>
       </TrackedPage>
@@ -102,7 +98,7 @@ export const FinancialDataEditPage = () => {
           <h1 className="text-2xl font-bold text-gray-900">Editar Datos Financieros</h1>
           <p className="text-sm text-gray-600">
             Actualiza los datos financieros para {countryCode}. Los valores se almacenan en la
-            moneda original y se mostrarán convertidos a USD.
+            moneda original y se mostrarán convertidos a {baseCurrency?.code ?? 'moneda base'}.
           </p>
         </header>
 
