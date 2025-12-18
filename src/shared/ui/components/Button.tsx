@@ -2,7 +2,7 @@ import type { ButtonHTMLAttributes, ReactNode } from 'react';
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
-  variant?: 'primary' | 'secondary';
+  variant?: 'primary' | 'secondary' | 'danger';
 }
 
 export const Button = ({ children, variant = 'primary', ...props }: ButtonProps) => {
@@ -12,7 +12,9 @@ export const Button = ({ children, variant = 'primary', ...props }: ButtonProps)
   const variantClasses =
     variant === 'secondary'
       ? 'border border-gray-300 bg-white text-gray-800 hover:bg-gray-50'
-      : 'bg-blue-600 text-white hover:bg-blue-700';
+      : variant === 'danger'
+        ? 'bg-red-600 text-white hover:bg-red-700'
+        : 'bg-blue-600 text-white hover:bg-blue-700';
 
   return (
     <button {...props} className={`${baseClasses} ${variantClasses} ${props.className ?? ''}`}>

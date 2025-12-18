@@ -15,3 +15,6 @@ export const selectFinancialDataIsLoadingSummary = (state: RootState) =>
 export const selectFinancialDataIsMutating = (state: RootState) => state.financialData.isMutating;
 
 export const selectFinancialDataError = (state: RootState) => state.financialData.error;
+
+export const selectFinancialDataMutationError = (state: RootState) =>
+  state.financialData.mutationError;
