@@ -7,7 +7,8 @@ export type FinancialDataState = {
   isLoadingList: boolean;
   isLoadingSummary: boolean;
   isMutating: boolean;
-  error: string | null;
+  error: string | null; // Error de carga de lista/summary
+  mutationError: string | null; // Error de mutaciones (create/update/delete)
 };
 
 const initialState: FinancialDataState = {
@@ -17,6 +18,7 @@ const initialState: FinancialDataState = {
   isLoadingSummary: false,
   isMutating: false,
   error: null,
+  mutationError: null,
 };
 
 const financialDataSlice = createSlice({
@@ -53,14 +55,15 @@ const financialDataSlice = createSlice({
 
     mutationStarted(state) {
       state.isMutating = true;
-      state.error = null;
+      state.mutationError = null;
     },
     mutationEnded(state) {
       state.isMutating = false;
+      state.mutationError = null;
     },
     mutationFailed(state, action: PayloadAction<string>) {
       state.isMutating = false;
-      state.error = action.payload;
+      state.mutationError = action.payload;
     },
 
     upsertFinancialData(state, action: PayloadAction<FinancialData>) {
@@ -80,6 +83,13 @@ const financialDataSlice = createSlice({
 
     setError(state, action: PayloadAction<string | null>) {
       state.error = action.payload;
+    },
+    clearMutationError(state) {
+      state.mutationError = null;
+    },
+    invalidateSummary(state) {
+      // Invalidate summary cache so it gets reloaded
+      state.summary = null;
     },
   },
 });
