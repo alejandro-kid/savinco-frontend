@@ -108,8 +108,9 @@ export const CountryListPage = () => {
   };
 
   const isProcessing = isCreating || isDeleting;
-  // Solo mostrar errores de carga en el dashboard (no errores de eliminación)
-  const errorMessage = error || createError;
+  // Solo mostrar errores de carga en el dashboard (no errores de mutaciones)
+  // Los errores de create se muestran en el modal, no en el dashboard
+  const errorMessage = error;
 
   return (
     <TrackedPage pageName="Dashboard" properties={{ section: 'country-list' }}>
@@ -167,7 +168,7 @@ export const CountryListPage = () => {
                 />
               </svg>
             </div>
-            <h3 className="mb-2 text-lg font-semibold text-gray-900">No hay países</h3>
+            <h3 className="mb-2 text-lg font-semibold text-gray-900">No hay datos que mostrar</h3>
             <p className="mb-6 text-sm text-gray-600">
               Comienza agregando un país con su moneda asociada.
             </p>
@@ -182,7 +183,9 @@ export const CountryListPage = () => {
         ) : null}
 
         {/* Cards Grid */}
-        {!isLoading && !errorMessage && items.length > 0 ? (
+        {/* Mostrar cards si hay items, independientemente de errores de mutación */}
+        {/* Solo ocultar si hay un error de carga (error) o si está cargando la lista inicial */}
+        {!isLoading && items.length > 0 ? (
           <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
             {items.map((item) => (
               <CountryCard

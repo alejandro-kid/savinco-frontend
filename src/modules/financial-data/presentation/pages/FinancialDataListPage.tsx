@@ -228,7 +228,7 @@ export const FinancialDataListPage = () => {
                 />
               </svg>
             </div>
-            <h3 className="mb-2 text-lg font-semibold text-gray-900">No hay datos financieros</h3>
+            <h3 className="mb-2 text-lg font-semibold text-gray-900">No hay datos que mostrar</h3>
             <p className="mb-6 text-sm text-gray-600">
               Comienza agregando datos financieros para un país.
             </p>
